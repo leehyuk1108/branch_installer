@@ -3,6 +3,7 @@
     "slug_owner": "ajouatom",
     "slug_branch": "carrot-wip",
     "aliases": [
+      "c",
       "cw"
     ],
     "git_url": "https://github.com/ajouatom/openpilot.git",
@@ -14,6 +15,7 @@
     "slug_owner": "leehyuk1108",
     "slug_branch": "release-c3-hl",
     "aliases": [
+      "h",
       "hl"
     ],
     "git_url": "https://github.com/leehyuk1108/sunny-hl.git",

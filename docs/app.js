@@ -192,6 +192,29 @@ function buildOfficialInstallerUrl(parsed) {
   return `https://installer.comma.ai/${parsed.owner}/${parsed.branch}`;
 }
 
+async function checkDynamicApi() {
+  try {
+    const response = await fetch("./api/status", { cache: "no-store" });
+    if (!response.ok) {
+      return false;
+    }
+
+    const payload = await response.json();
+    return payload?.dynamic === true;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveDynamicInstaller(rawValue) {
+  const params = new URLSearchParams({ input: rawValue });
+  const response = await fetch(`./api/resolve?${params.toString()}`, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Dynamic resolve failed: ${response.status}`);
+  }
+  return response.json();
+}
+
 function makeResultCard({ tone, title, body, rows, actions, note }) {
   const wrapper = document.createElement("article");
   wrapper.className = `result-card ${tone}`;
@@ -232,17 +255,18 @@ function makeResultCard({ tone, title, body, rows, actions, note }) {
   return wrapper;
 }
 
-function renderConverter(installerCatalog) {
+function renderConverter(installerCatalog, options = {}) {
   const form = document.getElementById("converter-form");
   const input = document.getElementById("branch-input");
   const result = document.getElementById("converter-result");
+  const dynamicApiAvailable = options.dynamicApiAvailable === true;
 
   function setResult(node) {
     result.innerHTML = "";
     result.appendChild(node);
   }
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const parsed = parseBranchInput(input.value);
@@ -258,7 +282,6 @@ function renderConverter(installerCatalog) {
     }
 
     const published = findPublishedInstaller(parsed, installerCatalog);
-    const officialUrl = buildOfficialInstallerUrl(parsed);
 
     if (published) {
       const shortUrl = published.short_download_path
@@ -285,6 +308,38 @@ function renderConverter(installerCatalog) {
       return;
     }
 
+    if (dynamicApiAvailable) {
+      try {
+        const resolved = await resolveDynamicInstaller(input.value);
+        const dynamicUrl = resolved.installer_url;
+        const isPublished = resolved.mode === "published";
+
+        setResult(makeResultCard({
+          tone: "success",
+          title: isPublished ? "Short installer link is ready" : "Dynamic installer URL generated",
+          body: isPublished
+            ? "This branch already has a published short alias on the server."
+            : "This server can generate an installer on demand for the requested GitHub repo and branch.",
+          rows: [
+            { label: "Input", value: parsed.sourceLabel },
+            { label: isPublished ? "Short installer URL" : "Dynamic installer URL", value: dynamicUrl, highlight: true },
+            { label: "Git target", value: `${resolved.git_url} @ ${resolved.git_branch}` },
+          ],
+          actions: [
+            { type: "copy", label: isPublished ? "Copy short URL" : "Copy dynamic URL", url: dynamicUrl },
+            { type: "open", label: "Open binary", url: dynamicUrl },
+          ],
+          note: isPublished
+            ? "Use the short installer URL directly on the comma device."
+            : "This link works on the comma device as long as this server stays reachable from the internet.",
+        }));
+        return;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    const officialUrl = buildOfficialInstallerUrl(parsed);
     if (officialUrl) {
       setResult(makeResultCard({
         tone: "warning",
@@ -320,6 +375,7 @@ function renderConverter(installerCatalog) {
 
 async function bootstrap() {
   const container = document.getElementById("installer-list");
+  const dynamicApiAvailable = await checkDynamicApi();
 
   try {
     const response = await fetch("./installers.json", { cache: "no-store" });
@@ -332,14 +388,14 @@ async function bootstrap() {
 
     if (!Array.isArray(installers) || installers.length === 0) {
       container.innerHTML = `<p class="empty-state">No installers have been generated yet.</p>`;
-      renderConverter([]);
+      renderConverter([], { dynamicApiAvailable });
       return;
     }
 
     installers.forEach((installer) => {
       container.appendChild(renderInstallerCard(installer));
     });
-    renderConverter(installers);
+    renderConverter(installers, { dynamicApiAvailable });
   } catch (error) {
     console.error(error);
     container.innerHTML = `<p class="error-state">Failed to load installer catalog.</p>`;

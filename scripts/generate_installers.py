@@ -1,121 +1,23 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import hashlib
-import json
-import os
-import re
 import shutil
-import urllib.request
+import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-ROOT = Path(__file__).resolve().parent.parent
-CONFIG_PATH = ROOT / "installer_targets.json"
-DOCS_PATH = ROOT / "docs"
-INSTALLERS_PATH = DOCS_PATH / "installers"
-MANIFEST_PATH = DOCS_PATH / "installers.json"
-CACHE_PATH = ROOT / ".cache"
-BASE_INSTALLER_PATH = CACHE_PATH / "base_installer.bin"
-
-BASE_INSTALLER_URL = os.environ.get("BASE_INSTALLER_URL", "https://openpilot.comma.ai")
-INSTALLER_USER_AGENT = os.environ.get("INSTALLER_USER_AGENT", "AGNOSSetup-10.1.0")
-INSTALLER_DEVICE_TYPE = os.environ.get("INSTALLER_DEVICE_TYPE", "tizi")
-
-URL_SLOT_PATTERN = re.compile(rb"https://github\.com/commaai/openpilot\.git\?[ ]+")
-BRANCH_SLOT_PATTERN = re.compile(rb"release3\?[ ]+")
-
-
-def sha256_bytes(data: bytes) -> str:
-  return hashlib.sha256(data).hexdigest()
-
-
-def ensure_dir(path: Path) -> None:
-  path.mkdir(parents=True, exist_ok=True)
-
-
-def cleanup_generated_root_aliases() -> None:
-  manifest_data = []
-  if MANIFEST_PATH.exists():
-    with MANIFEST_PATH.open() as f:
-      manifest_data = json.load(f)
-
-  for entry in manifest_data:
-    for alias in entry.get("aliases", []):
-      alias_path = DOCS_PATH / alias
-      if alias_path.is_file():
-        alias_path.unlink()
-
-
-def fetch_base_installer() -> bytes:
-  ensure_dir(CACHE_PATH)
-  if BASE_INSTALLER_PATH.exists():
-    data = BASE_INSTALLER_PATH.read_bytes()
-    validate_elf(data, f"cached installer at {BASE_INSTALLER_PATH}")
-    return data
-
-  headers = {
-    "User-Agent": INSTALLER_USER_AGENT,
-    "X-openpilot-device-type": INSTALLER_DEVICE_TYPE,
-  }
-  request = urllib.request.Request(BASE_INSTALLER_URL, headers=headers)
-  with urllib.request.urlopen(request, timeout=30) as response:
-    data = response.read()
-
-  validate_elf(data, f"download from {BASE_INSTALLER_URL}")
-  BASE_INSTALLER_PATH.write_bytes(data)
-  return data
-
-
-def validate_elf(data: bytes, source: str) -> None:
-  if data[:4] != b"\x7fELF":
-    raise RuntimeError(f"expected ELF data from {source}, got {data[:32]!r}")
-
-
-def patch_slot(blob: bytearray, pattern: re.Pattern[bytes], value: str, label: str) -> None:
-  match = pattern.search(blob)
-  if match is None:
-    raise RuntimeError(f"could not find {label} slot in installer template")
-
-  slot_len = match.end() - match.start()
-  encoded = value.encode("utf-8")
-  if len(encoded) + 1 > slot_len:
-    raise RuntimeError(
-      f"{label} value is too long for template slot: {value!r} ({len(encoded)} bytes > {slot_len - 1})"
-    )
-
-  replacement = encoded + b"?" + (b" " * (slot_len - len(encoded) - 1))
-  blob[match.start():match.end()] = replacement
-
-
-def load_targets() -> list[dict]:
-  with CONFIG_PATH.open() as f:
-    data = json.load(f)
-
-  if not isinstance(data, list) or not data:
-    raise RuntimeError("installer_targets.json must contain a non-empty array")
-
-  required = {"slug_owner", "slug_branch", "git_url", "git_branch", "title", "description"}
-  for target in data:
-    missing = sorted(required - set(target))
-    if missing:
-      raise RuntimeError(f"target is missing required keys: {missing}")
-    aliases = target.get("aliases", [])
-    if not isinstance(aliases, list):
-      raise RuntimeError("aliases must be a list when present")
-    for alias in aliases:
-      if not isinstance(alias, str) or not alias:
-        raise RuntimeError("aliases must contain non-empty strings")
-      if "/" in alias:
-        raise RuntimeError(f"alias must not contain '/': {alias!r}")
-  return data
-
-
-def build_installer(base_installer: bytes, target: dict) -> bytes:
-  blob = bytearray(base_installer)
-  patch_slot(blob, URL_SLOT_PATTERN, target["git_url"], "git_url")
-  patch_slot(blob, BRANCH_SLOT_PATTERN, target["git_branch"], "git_branch")
-  return bytes(blob)
+from installer_lib import (
+  DOCS_PATH,
+  INSTALLERS_PATH,
+  build_installer_for_target,
+  cleanup_generated_root_aliases,
+  ensure_dir,
+  fetch_base_installer,
+  load_targets,
+  manifest_entry_from_target,
+  write_manifest,
+)
 
 
 def reset_output_dirs() -> None:
@@ -126,10 +28,6 @@ def reset_output_dirs() -> None:
   ensure_dir(INSTALLERS_PATH)
 
 
-def write_manifest(entries: list[dict]) -> None:
-  MANIFEST_PATH.write_text(json.dumps(entries, indent=2) + "\n")
-
-
 def main() -> None:
   targets = load_targets()
   base_installer = fetch_base_installer()
@@ -137,33 +35,16 @@ def main() -> None:
 
   manifest: list[dict] = []
   for target in targets:
-    installer_bytes = build_installer(base_installer, target)
-    validate_elf(installer_bytes, f"patched installer for {target['slug_owner']}/{target['slug_branch']}")
+    installer_bytes = build_installer_for_target(base_installer, target)
 
     out_dir = INSTALLERS_PATH / target["slug_owner"] / target["slug_branch"]
     ensure_dir(out_dir)
-    out_path = out_dir / "installer"
-    out_path.write_bytes(installer_bytes)
+    (out_dir / "installer").write_bytes(installer_bytes)
 
-    aliases = target.get("aliases", [])
-    for alias in aliases:
-      alias_path = DOCS_PATH / alias
-      alias_path.write_bytes(installer_bytes)
+    for alias in target.get("aliases", []):
+      (DOCS_PATH / alias).write_bytes(installer_bytes)
 
-    manifest.append({
-      "slug_owner": target["slug_owner"],
-      "slug_branch": target["slug_branch"],
-      "aliases": aliases,
-      "git_url": target["git_url"],
-      "git_branch": target["git_branch"],
-      "title": target["title"],
-      "description": target["description"],
-      "download_path": f"installers/{target['slug_owner']}/{target['slug_branch']}/installer",
-      "download_url_hint": f"/installers/{target['slug_owner']}/{target['slug_branch']}/installer",
-      "short_download_path": aliases[0] if aliases else None,
-      "sha256": sha256_bytes(installer_bytes),
-      "size_bytes": len(installer_bytes),
-    })
+    manifest.append(manifest_entry_from_target(target, installer_bytes))
 
   write_manifest(manifest)
   print(f"generated {len(manifest)} installer(s)")

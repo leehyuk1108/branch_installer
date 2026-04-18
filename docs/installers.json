@@ -3,6 +3,7 @@
     "slug_owner": "ajouatom",
     "slug_branch": "carrot-wip",
     "aliases": [
+      "c",
       "cw"
     ],
     "git_url": "https://github.com/ajouatom/openpilot.git",
@@ -11,7 +12,7 @@
     "description": "Static installer for ajouatom/openpilot on the carrot-wip branch.",
     "download_path": "installers/ajouatom/carrot-wip/installer",
     "download_url_hint": "/installers/ajouatom/carrot-wip/installer",
-    "short_download_path": "cw",
+    "short_download_path": "c",
     "sha256": "c2795676b0aaccf6b7e3ad347a8dbf26b6426b146933182b7436c37cf91092c9",
     "size_bytes": 1270680
   },
@@ -19,6 +20,7 @@
     "slug_owner": "leehyuk1108",
     "slug_branch": "release-c3-hl",
     "aliases": [
+      "h",
       "hl"
     ],
     "git_url": "https://github.com/leehyuk1108/sunny-hl.git",
@@ -27,7 +29,7 @@
     "description": "Static installer for leehyuk1108/sunny-hl on the release-c3-hl branch.",
     "download_path": "installers/leehyuk1108/release-c3-hl/installer",
     "download_url_hint": "/installers/leehyuk1108/release-c3-hl/installer",
-    "short_download_path": "hl",
+    "short_download_path": "h",
     "sha256": "bb94fece83af8ad7c88e148657da030410e00c378935ea0caa256287e580714f",
     "size_bytes": 1270680
   }

@@ -1,11 +1,11 @@
 # branch_installer
 
-Static comma installer hosting for GitHub Pages.
+Comma installer hosting with short aliases and optional dynamic server mode.
 
 This project does two things:
 
 1. builds pre-patched `installer` ELF files that point at a chosen Git repository and branch
-2. publishes those files and a small human-friendly catalog through GitHub Pages
+2. publishes those files through GitHub Pages or serves them dynamically from your own machine
 
 ## Why this repo exists
 
@@ -17,20 +17,30 @@ That means GitHub Pages can host a working installer only if the final install U
 https://<user>.github.io/branch_installer/installers/<owner>/<branch>/installer
 ```
 
-The landing page is for humans. The direct `/installer` file is for the comma device.
+The landing page is for humans. The direct installer URL is for the comma device.
 
-## What this does not do
+## Hosting modes
 
-- It does not dynamically generate installers on request.
-- It does not inspect arbitrary owner/branch input at runtime.
-- It does not replace a real application server when you need per-request logic.
+### GitHub Pages
+
+- pre-generated aliases such as `/c` or `/h`
+- zero infrastructure beyond GitHub
+- best when you already know which repos and branches to publish
 
 GitHub Pages is static hosting, so every supported installer must be generated ahead of time.
+
+### Dynamic server
+
+- serves the same catalog UI
+- can generate installers on demand for arbitrary GitHub repo and branch pairs
+- can be exposed from a home PC with port forwarding or a tunnel
 
 ## Layout
 
 - `installer_targets.json`: list of installers to publish
+- `installer_lib.py`: shared installer patching logic
 - `scripts/generate_installers.py`: patches the official installer template
+- `server.py`: optional dynamic server for your own machine
 - `docs/`: GitHub Pages site and generated installer files
 
 ## Generate installers locally
@@ -72,14 +82,52 @@ Edit `installer_targets.json` and add another object:
 }
 ```
 
-If `aliases` is present, the first alias becomes the short direct URL:
+If `aliases` is present, the first alias becomes the preferred short direct URL:
 
 ```text
 https://<user>.github.io/branch_installer/<alias>
 ```
+
+Extra aliases still work. For example, `["h", "hl"]` makes both `/h` and `/hl` valid.
 
 Then rerun:
 
 ```bash
 python3 scripts/generate_installers.py
 ```
+
+## Run the dynamic server
+
+```bash
+cd /Users/ijonghyeog/Desktop/Coding/branch_installer
+python3 server.py --host 0.0.0.0 --port 8080
+```
+
+Useful routes:
+
+- `/c`, `/h`: short aliases from `installer_targets.json`
+- `/i/<owner>/<repo>/<branch>`: on-demand installer generation
+- `/api/resolve?input=<github branch url>`: converter endpoint for the UI
+
+Examples:
+
+```text
+http://YOUR-PC:8080/h
+http://YOUR-PC:8080/i/leehyuk1108/sunny-hl/release-c3-hl
+```
+
+## Expose it outside your house
+
+You have two practical options:
+
+1. Port forward `80` or `8080` on your router to the PC running `server.py`
+2. Put a reverse proxy or tunnel in front of it and use your own short domain
+
+If you want the shortest usable links, pair the server with a short domain and single-letter aliases:
+
+```text
+https://p.example/h
+https://p.example/c
+```
+
+That is the piece GitHub Pages cannot solve by itself because the `github.io` hostname is long and the hosting is static.
