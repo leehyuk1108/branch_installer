@@ -113,10 +113,20 @@ function renderInstallerCard(installer) {
 function parseBranchInput(rawValue) {
   const raw = rawValue.trim();
   if (!raw) {
-    return { error: "Paste a GitHub branch URL or owner/branch first." };
+    return { error: "Paste a GitHub branch URL, installer URL, owner/branch, or owner/repo/branch first." };
   }
 
-  const ownerBranchMatch = raw.match(/^([^/.]+)\/([^/]+)$/);
+  const ownerRepoBranchMatch = raw.match(/^([^/]+)\/([^/]+)\/(.+)$/);
+  if (ownerRepoBranchMatch) {
+    return {
+      owner: ownerRepoBranchMatch[1],
+      repo: ownerRepoBranchMatch[2],
+      branch: ownerRepoBranchMatch[3],
+      sourceLabel: `${ownerRepoBranchMatch[1]}/${ownerRepoBranchMatch[2]}/${ownerRepoBranchMatch[3]}`,
+    };
+  }
+
+  const ownerBranchMatch = raw.match(/^([^/]+)\/([^/]+)$/);
   if (ownerBranchMatch) {
     return {
       owner: ownerBranchMatch[1],
@@ -138,7 +148,7 @@ function parseBranchInput(rawValue) {
 
   if (host === "github.com") {
     if (parts.length < 4 || parts[2] !== "tree") {
-      return { error: "Paste the GitHub branch root URL. Example: https://github.com/owner/openpilot/tree/branch-name" };
+      return { error: "Paste the GitHub branch root URL. Example: https://github.com/owner/repo/tree/branch-name" };
     }
 
     return {
@@ -279,7 +289,7 @@ function renderConverter(installerCatalog) {
       setResult(makeResultCard({
         tone: "warning",
         title: "Official installer URL generated",
-        body: "This branch does not have a short static alias on this site yet, but the standard comma installer URL can be generated.",
+        body: "This branch does not have a short static alias on this site yet, but the standard comma installer URL can be generated for openpilot-compatible targets.",
         rows: [
           { label: "Input", value: parsed.sourceLabel },
           { label: "Official installer URL", value: officialUrl, highlight: true },
@@ -303,7 +313,7 @@ function renderConverter(installerCatalog) {
         { label: "Requested Git target", value: `https://github.com/${parsed.owner}/${parsed.repo}.git @ ${parsed.branch}` },
       ],
       actions: [],
-      note: "For non-openpilot repos or slash-based branch paths, publish a pre-generated installer in this catalog first.",
+      note: "For non-openpilot repos, slash-based branch paths, or any custom git target, publish a pre-generated installer in this catalog first.",
     }));
   });
 }

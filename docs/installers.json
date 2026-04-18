@@ -14,5 +14,21 @@
     "short_download_path": "cw",
     "sha256": "c2795676b0aaccf6b7e3ad347a8dbf26b6426b146933182b7436c37cf91092c9",
     "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "leehyuk1108",
+    "slug_branch": "release-c3-hl",
+    "aliases": [
+      "hl"
+    ],
+    "git_url": "https://github.com/leehyuk1108/sunny-hl.git",
+    "git_branch": "release-c3-hl",
+    "title": "sunny-hl release-c3-hl",
+    "description": "Static installer for leehyuk1108/sunny-hl on the release-c3-hl branch.",
+    "download_path": "installers/leehyuk1108/release-c3-hl/installer",
+    "download_url_hint": "/installers/leehyuk1108/release-c3-hl/installer",
+    "short_download_path": "hl",
+    "sha256": "bb94fece83af8ad7c88e148657da030410e00c378935ea0caa256287e580714f",
+    "size_bytes": 1270680
   }
 ]

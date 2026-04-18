@@ -9,5 +9,16 @@
     "git_branch": "carrot-wip",
     "title": "CarrotPilot WIP",
     "description": "Static installer for ajouatom/openpilot on the carrot-wip branch."
+  },
+  {
+    "slug_owner": "leehyuk1108",
+    "slug_branch": "release-c3-hl",
+    "aliases": [
+      "hl"
+    ],
+    "git_url": "https://github.com/leehyuk1108/sunny-hl.git",
+    "git_branch": "release-c3-hl",
+    "title": "sunny-hl release-c3-hl",
+    "description": "Static installer for leehyuk1108/sunny-hl on the release-c3-hl branch."
   }
 ]
