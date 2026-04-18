@@ -23,6 +23,13 @@ function renderInstallerCard(installer) {
   article.className = "installer-card";
 
   const directUrl = toAbsoluteDownloadUrl(installer.download_path);
+  const shortUrl = installer.short_download_path
+    ? toAbsoluteDownloadUrl(installer.short_download_path)
+    : null;
+  const preferredUrl = shortUrl || directUrl;
+  const aliasText = Array.isArray(installer.aliases) && installer.aliases.length > 0
+    ? installer.aliases.join(", ")
+    : "none";
 
   article.innerHTML = `
     <div class="meta-grid">
@@ -40,8 +47,16 @@ function renderInstallerCard(installer) {
         <div class="mono">${installer.git_branch}</div>
       </div>
       <div class="meta-row">
-        <span class="meta-label">Direct installer URL</span>
-        <div class="url-box mono">${directUrl}</div>
+        <span class="meta-label">Short installer URL</span>
+        <div class="url-box mono">${preferredUrl}</div>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Aliases</span>
+        <div class="mono">${aliasText}</div>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">Full installer URL</span>
+        <div class="mono">${directUrl}</div>
       </div>
       <div class="meta-row">
         <span class="meta-label">Binary</span>
@@ -56,12 +71,12 @@ function renderInstallerCard(installer) {
   const copyButton = document.createElement("button");
   copyButton.className = "action-button action-primary";
   copyButton.textContent = "Copy URL";
-  copyButton.addEventListener("click", () => copyText(directUrl, copyButton));
+  copyButton.addEventListener("click", () => copyText(preferredUrl, copyButton));
 
   const openButton = document.createElement("a");
   openButton.className = "action-button action-secondary";
   openButton.textContent = "Open Binary";
-  openButton.href = directUrl;
+  openButton.href = preferredUrl;
   openButton.target = "_blank";
   openButton.rel = "noreferrer";
 
@@ -97,4 +112,3 @@ async function bootstrap() {
 }
 
 bootstrap();
-

@@ -64,6 +64,7 @@ Edit `installer_targets.json` and add another object:
 {
   "slug_owner": "example",
   "slug_branch": "release-c3",
+  "aliases": ["rc3"],
   "git_url": "https://github.com/example/openpilot.git",
   "git_branch": "release-c3",
   "title": "Example release-c3",
@@ -71,9 +72,14 @@ Edit `installer_targets.json` and add another object:
 }
 ```
 
+If `aliases` is present, the first alias becomes the short direct URL:
+
+```text
+https://<user>.github.io/branch_installer/<alias>
+```
+
 Then rerun:
 
 ```bash
 python3 scripts/generate_installers.py
 ```
-

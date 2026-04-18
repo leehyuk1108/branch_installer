@@ -34,6 +34,19 @@ def ensure_dir(path: Path) -> None:
   path.mkdir(parents=True, exist_ok=True)
 
 
+def cleanup_generated_root_aliases() -> None:
+  manifest_data = []
+  if MANIFEST_PATH.exists():
+    with MANIFEST_PATH.open() as f:
+      manifest_data = json.load(f)
+
+  for entry in manifest_data:
+    for alias in entry.get("aliases", []):
+      alias_path = DOCS_PATH / alias
+      if alias_path.is_file():
+        alias_path.unlink()
+
+
 def fetch_base_installer() -> bytes:
   ensure_dir(CACHE_PATH)
   if BASE_INSTALLER_PATH.exists():
@@ -87,6 +100,14 @@ def load_targets() -> list[dict]:
     missing = sorted(required - set(target))
     if missing:
       raise RuntimeError(f"target is missing required keys: {missing}")
+    aliases = target.get("aliases", [])
+    if not isinstance(aliases, list):
+      raise RuntimeError("aliases must be a list when present")
+    for alias in aliases:
+      if not isinstance(alias, str) or not alias:
+        raise RuntimeError("aliases must contain non-empty strings")
+      if "/" in alias:
+        raise RuntimeError(f"alias must not contain '/': {alias!r}")
   return data
 
 
@@ -99,6 +120,7 @@ def build_installer(base_installer: bytes, target: dict) -> bytes:
 
 def reset_output_dirs() -> None:
   ensure_dir(DOCS_PATH)
+  cleanup_generated_root_aliases()
   if INSTALLERS_PATH.exists():
     shutil.rmtree(INSTALLERS_PATH)
   ensure_dir(INSTALLERS_PATH)
@@ -123,15 +145,22 @@ def main() -> None:
     out_path = out_dir / "installer"
     out_path.write_bytes(installer_bytes)
 
+    aliases = target.get("aliases", [])
+    for alias in aliases:
+      alias_path = DOCS_PATH / alias
+      alias_path.write_bytes(installer_bytes)
+
     manifest.append({
       "slug_owner": target["slug_owner"],
       "slug_branch": target["slug_branch"],
+      "aliases": aliases,
       "git_url": target["git_url"],
       "git_branch": target["git_branch"],
       "title": target["title"],
       "description": target["description"],
       "download_path": f"installers/{target['slug_owner']}/{target['slug_branch']}/installer",
       "download_url_hint": f"/installers/{target['slug_owner']}/{target['slug_branch']}/installer",
+      "short_download_path": aliases[0] if aliases else None,
       "sha256": sha256_bytes(installer_bytes),
       "size_bytes": len(installer_bytes),
     })
@@ -144,4 +173,3 @@ def main() -> None:
 
 if __name__ == "__main__":
   main()
-
