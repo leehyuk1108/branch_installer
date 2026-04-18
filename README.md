@@ -1,11 +1,11 @@
 # branch_installer
 
-Comma installer hosting with short aliases and optional dynamic server mode.
+Comma installer hosting with short aliases, Netlify Functions, and optional local server mode.
 
 This project does two things:
 
 1. builds pre-patched `installer` ELF files that point at a chosen Git repository and branch
-2. publishes those files through GitHub Pages or serves them dynamically from your own machine
+2. publishes those files through GitHub Pages, Netlify, or a local dynamic server
 
 ## Why this repo exists
 
@@ -35,11 +35,19 @@ GitHub Pages is static hosting, so every supported installer must be generated a
 - can generate installers on demand for arbitrary GitHub repo and branch pairs
 - can be exposed from a home PC with port forwarding or a tunnel
 
+### Netlify
+
+- serves the `docs/` site as static assets
+- handles `/api/*` and `/i/*` through Netlify Functions
+- keeps short published aliases like `/c` and `/h`
+- removes the need to keep your own PC online
+
 ## Layout
 
 - `installer_targets.json`: list of installers to publish
 - `installer_lib.py`: shared installer patching logic
 - `scripts/generate_installers.py`: patches the official installer template
+- `netlify/functions/installer.mts`: dynamic installer function for Netlify
 - `server.py`: optional dynamic server for your own machine
 - `docs/`: GitHub Pages site and generated installer files
 
@@ -65,6 +73,22 @@ By default this:
 4. Set the Pages source to GitHub Actions, or serve from the `docs/` folder on `main`.
 
 If you use GitHub Actions, the included workflow can regenerate installers after config changes.
+
+## Publish with Netlify
+
+This repo is already set up for Netlify:
+
+- static assets publish from `docs`
+- dynamic routes are handled by `netlify/functions/installer.mts`
+- config lives in `netlify.toml`
+
+For local Netlify emulation:
+
+```bash
+cd /Users/ijonghyeog/Desktop/Coding/branch_installer
+npm install
+npm run netlify:dev
+```
 
 ## Add another installer
 

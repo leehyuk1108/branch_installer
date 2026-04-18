@@ -1,0 +1,17 @@
+{
+  "name": "branch_installer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "python3 scripts/generate_installers.py",
+    "typecheck": "tsc --noEmit",
+    "netlify:dev": "netlify dev"
+  },
+  "dependencies": {
+    "@netlify/functions": "^4.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.3"
+  }
+}
