@@ -31,6 +31,38 @@
         </div>
       </header>
 
+      <section class="panel converter-panel">
+        <div class="panel-heading">
+          <p class="panel-kicker">Branch Converter</p>
+          <h2>Paste a branch link</h2>
+        </div>
+        <form id="converter-form" class="converter-form">
+          <label class="converter-label" for="branch-input">
+            Paste a GitHub branch URL, an official installer URL, or just <code>owner/branch</code>.
+          </label>
+          <div class="converter-controls">
+            <input
+              id="branch-input"
+              class="converter-input"
+              type="text"
+              name="branch-input"
+              placeholder="https://github.com/ajouatom/openpilot/tree/carrot-wip"
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <button type="submit" class="action-button action-primary">Convert</button>
+          </div>
+          <p class="converter-hint">
+            Best input: the branch root URL, not a file URL inside the branch.
+          </p>
+        </form>
+        <div id="converter-result" class="converter-result">
+          <p class="empty-state">
+            Example: paste <code>https://github.com/ajouatom/openpilot/tree/carrot-wip</code> and this page will tell you whether a short installer link already exists.
+          </p>
+        </div>
+      </section>
+
       <main class="layout">
         <section class="panel panel-primary">
           <div class="panel-heading">
@@ -66,4 +98,3 @@
     <script src="./app.js"></script>
   </body>
 </html>
-
