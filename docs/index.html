@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>branch_installer</title>
+    <meta name="description" content="Static comma installer catalog hosted on GitHub Pages.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">Static GitHub Pages Installer Hosting</p>
+        <h1>branch_installer</h1>
+        <p class="hero-copy">
+          Human-friendly catalog up front, direct ELF installer files underneath.
+          Enter the direct installer URL on the comma device, not this page URL.
+        </p>
+        <div class="hero-callouts">
+          <div class="callout">
+            <span class="callout-label">Works for</span>
+            <strong>pre-generated installer binaries</strong>
+          </div>
+          <div class="callout">
+            <span class="callout-label">Does not do</span>
+            <strong>on-demand branch generation</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel panel-primary">
+          <div class="panel-heading">
+            <p class="panel-kicker">Published Installers</p>
+            <h2>Ready-to-use URLs</h2>
+          </div>
+          <div id="installer-list" class="installer-list">
+            <p class="loading">Loading installer catalog…</p>
+          </div>
+        </section>
+
+        <aside class="panel panel-secondary">
+          <div class="panel-heading">
+            <p class="panel-kicker">How To Use</p>
+            <h2>Device flow</h2>
+          </div>
+          <ol class="steps">
+            <li>Open a card and copy the direct installer URL.</li>
+            <li>On the comma device, choose <code>Custom Software</code>.</li>
+            <li>Paste the direct <code>/installer</code> URL.</li>
+            <li>The device downloads an ELF installer, then that installer clones the target Git branch.</li>
+          </ol>
+          <div class="warning-box">
+            <p class="warning-title">Important</p>
+            <p>
+              GitHub Pages is static hosting. The landing page is for people. The comma device must receive the ELF file directly.
+            </p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+

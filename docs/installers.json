@@ -1,0 +1,14 @@
+[
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "carrot-wip",
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "carrot-wip",
+    "title": "CarrotPilot WIP",
+    "description": "Static installer for ajouatom/openpilot on the carrot-wip branch.",
+    "download_path": "installers/ajouatom/carrot-wip/installer",
+    "download_url_hint": "/installers/ajouatom/carrot-wip/installer",
+    "sha256": "c2795676b0aaccf6b7e3ad347a8dbf26b6426b146933182b7436c37cf91092c9",
+    "size_bytes": 1270680
+  }
+]

@@ -1,0 +1,44 @@
+name: Generate Installers
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - installer_targets.json
+      - scripts/generate_installers.py
+      - docs/index.html
+      - docs/styles.css
+      - docs/app.js
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate installer binaries
+        run: python3 scripts/generate_installers.py
+
+      - name: Commit generated files
+        run: |
+          if git diff --quiet; then
+            echo "No generated file changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/installers docs/installers.json
+          git commit -m "Regenerate static installers"
+          git push
