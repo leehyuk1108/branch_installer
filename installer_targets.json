@@ -9,7 +9,7 @@
     "git_url": "https://github.com/ajouatom/openpilot.git",
     "git_branch": "carrot-wip",
     "title": "CarrotPilot WIP",
-    "description": "Static installer for ajouatom/openpilot on the carrot-wip branch."
+    "description": "ajouatom/openpilot의 carrot-wip 브랜치를 위한 정적 인스톨러입니다."
   },
   {
     "slug_owner": "leehyuk1108",
@@ -21,7 +21,7 @@
     "git_url": "https://github.com/leehyuk1108/sunny-hl.git",
     "git_branch": "release-c3-hl",
     "title": "sunny-hl release-c3-hl",
-    "description": "Static installer for leehyuk1108/sunny-hl on the release-c3-hl branch."
+    "description": "leehyuk1108/sunny-hl의 release-c3-hl 브랜치를 위한 정적 인스톨러입니다."
   },
   {
     "slug_owner": "HyukLee-og",
@@ -32,6 +32,6 @@
     "git_url": "https://github.com/HyukLee-og/starpilot.git",
     "git_branch": "SP-Old",
     "title": "starpilot SP-Old",
-    "description": "Static installer for HyukLee-og/starpilot on the SP-Old branch."
+    "description": "HyukLee-og/starpilot의 SP-Old 브랜치를 위한 정적 인스톨러입니다."
   }
 ]

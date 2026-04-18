@@ -14,7 +14,7 @@ function escapeHtml(value) {
 function copyText(text, button) {
   navigator.clipboard.writeText(text).then(() => {
     const original = button.textContent;
-    button.textContent = "Copied";
+    button.textContent = "복사됨";
     window.setTimeout(() => {
       button.textContent = original;
     }, 1200);
@@ -76,35 +76,35 @@ function renderInstallerCard(installer) {
     </div>
     <div class="meta-grid">
       <div class="meta-row">
-        <span class="meta-label">Git target</span>
+        <span class="meta-label">Git 대상</span>
         <div class="mono">${escapeHtml(installer.git_url)}</div>
       </div>
       <div class="meta-row">
-        <span class="meta-label">Branch</span>
+        <span class="meta-label">브랜치</span>
         <div class="mono">${escapeHtml(installer.git_branch)}</div>
       </div>
       <div class="meta-row">
-        <span class="meta-label">Short installer URL</span>
+        <span class="meta-label">짧은 인스톨러 URL</span>
         <div class="url-box mono">${escapeHtml(preferredUrl)}</div>
       </div>
       <div class="meta-row">
-        <span class="meta-label">Aliases</span>
+        <span class="meta-label">별칭</span>
         <div class="mono">${escapeHtml(aliasText)}</div>
       </div>
       <div class="meta-row">
-        <span class="meta-label">Full installer URL</span>
+        <span class="meta-label">전체 인스톨러 URL</span>
         <div class="mono">${escapeHtml(directUrl)}</div>
       </div>
       <div class="meta-row">
-        <span class="meta-label">Binary</span>
+        <span class="meta-label">바이너리</span>
         <div class="mono">${formatBytes(installer.size_bytes)} · sha256 ${escapeHtml(installer.sha256)}</div>
       </div>
     </div>
   `;
 
   article.appendChild(renderActions([
-    { type: "copy", label: "Copy URL", url: preferredUrl },
-    { type: "open", label: "Open Binary", url: preferredUrl },
+    { type: "copy", label: "URL 복사", url: preferredUrl },
+    { type: "open", label: "바이너리 열기", url: preferredUrl },
   ]));
 
   return article;
@@ -113,7 +113,7 @@ function renderInstallerCard(installer) {
 function parseBranchInput(rawValue) {
   const raw = rawValue.trim();
   if (!raw) {
-    return { error: "Paste a GitHub branch URL, installer URL, owner/branch, or owner/repo/branch first." };
+    return { error: "GitHub 브랜치 URL, installer URL, owner/branch, 또는 owner/repo/branch를 먼저 입력해주세요." };
   }
 
   const ownerRepoBranchMatch = raw.match(/^([^/]+)\/([^/]+)\/(.+)$/);
@@ -140,7 +140,7 @@ function parseBranchInput(rawValue) {
   try {
     url = new URL(raw);
   } catch {
-    return { error: "That does not look like a valid URL or owner/branch pair." };
+    return { error: "올바른 URL 또는 owner/branch 형식으로 보이지 않습니다." };
   }
 
   const host = url.hostname.replace(/^www\./, "");
@@ -148,7 +148,7 @@ function parseBranchInput(rawValue) {
 
   if (host === "github.com") {
     if (parts.length < 4 || parts[2] !== "tree") {
-      return { error: "Paste the GitHub branch root URL. Example: https://github.com/owner/repo/tree/branch-name" };
+      return { error: "GitHub 브랜치 루트 URL을 넣어주세요. 예: https://github.com/owner/repo/tree/branch-name" };
     }
 
     return {
@@ -161,7 +161,7 @@ function parseBranchInput(rawValue) {
 
   if (host === "installer.comma.ai") {
     if (parts.length < 2) {
-      return { error: "Expected installer URL format: https://installer.comma.ai/owner/branch" };
+      return { error: "installer URL 형식은 https://installer.comma.ai/owner/branch 이어야 합니다." };
     }
 
     return {
@@ -172,7 +172,7 @@ function parseBranchInput(rawValue) {
     };
   }
 
-  return { error: "Only GitHub branch URLs, installer.comma.ai URLs, and owner/branch input are supported here." };
+  return { error: "여기서는 GitHub 브랜치 URL, installer.comma.ai URL, owner/branch 입력만 지원합니다." };
 }
 
 function findPublishedInstaller(parsed, installers) {
@@ -273,7 +273,7 @@ function renderConverter(installerCatalog, options = {}) {
     if (parsed.error) {
       setResult(makeResultCard({
         tone: "warning",
-        title: "Could not parse that input",
+        title: "입력을 해석할 수 없습니다",
         body: parsed.error,
         rows: [],
         actions: [],
@@ -291,19 +291,19 @@ function renderConverter(installerCatalog, options = {}) {
 
       setResult(makeResultCard({
         tone: "success",
-        title: "Short installer link is ready",
-        body: "This branch already has a published static installer on this site.",
+        title: "짧은 인스톨러 링크가 준비되었습니다",
+        body: "이 브랜치는 이미 이 사이트에 정적 인스톨러로 등록되어 있습니다.",
         rows: [
-          { label: "Input", value: parsed.sourceLabel },
-          { label: "Short installer URL", value: shortUrl, highlight: true },
-          { label: "Full installer URL", value: fullUrl },
-          { label: "Git target", value: `${published.git_url} @ ${published.git_branch}` },
+          { label: "입력값", value: parsed.sourceLabel },
+          { label: "짧은 인스톨러 URL", value: shortUrl, highlight: true },
+          { label: "전체 인스톨러 URL", value: fullUrl },
+          { label: "Git 대상", value: `${published.git_url} @ ${published.git_branch}` },
         ],
         actions: [
-          { type: "copy", label: "Copy short URL", url: shortUrl },
-          { type: "open", label: "Open binary", url: shortUrl },
+          { type: "copy", label: "짧은 URL 복사", url: shortUrl },
+          { type: "open", label: "바이너리 열기", url: shortUrl },
         ],
-        note: "Use the short installer URL directly on the comma device.",
+        note: "comma 기기에는 이 짧은 인스톨러 URL을 그대로 넣으면 됩니다.",
       }));
       return;
     }
@@ -316,22 +316,22 @@ function renderConverter(installerCatalog, options = {}) {
 
         setResult(makeResultCard({
           tone: "success",
-          title: isPublished ? "Short installer link is ready" : "Dynamic installer URL generated",
+          title: isPublished ? "짧은 인스톨러 링크가 준비되었습니다" : "동적 인스톨러 URL이 생성되었습니다",
           body: isPublished
-            ? "This branch already has a published short alias on the server."
-            : "This server can generate an installer on demand for the requested GitHub repo and branch.",
+            ? "이 브랜치는 이미 서버에 짧은 별칭으로 등록되어 있습니다."
+            : "이 서버는 요청한 GitHub repo와 브랜치에 대해 즉시 인스톨러를 생성할 수 있습니다.",
           rows: [
-            { label: "Input", value: parsed.sourceLabel },
-            { label: isPublished ? "Short installer URL" : "Dynamic installer URL", value: dynamicUrl, highlight: true },
-            { label: "Git target", value: `${resolved.git_url} @ ${resolved.git_branch}` },
+            { label: "입력값", value: parsed.sourceLabel },
+            { label: isPublished ? "짧은 인스톨러 URL" : "동적 인스톨러 URL", value: dynamicUrl, highlight: true },
+            { label: "Git 대상", value: `${resolved.git_url} @ ${resolved.git_branch}` },
           ],
           actions: [
-            { type: "copy", label: isPublished ? "Copy short URL" : "Copy dynamic URL", url: dynamicUrl },
-            { type: "open", label: "Open binary", url: dynamicUrl },
+            { type: "copy", label: isPublished ? "짧은 URL 복사" : "동적 URL 복사", url: dynamicUrl },
+            { type: "open", label: "바이너리 열기", url: dynamicUrl },
           ],
           note: isPublished
-            ? "Use the short installer URL directly on the comma device."
-            : "This link works on the comma device as long as this server stays reachable from the internet.",
+            ? "comma 기기에는 이 짧은 인스톨러 URL을 그대로 넣으면 됩니다."
+            : "이 링크는 서버가 외부에서 계속 접근 가능한 동안 comma 기기에서 사용할 수 있습니다.",
         }));
         return;
       } catch (error) {
@@ -343,32 +343,32 @@ function renderConverter(installerCatalog, options = {}) {
     if (officialUrl) {
       setResult(makeResultCard({
         tone: "warning",
-        title: "Official installer URL generated",
-        body: "This branch does not have a short static alias on this site yet, but the standard comma installer URL can be generated for openpilot-compatible targets.",
+        title: "공식 installer URL을 생성했습니다",
+        body: "이 브랜치는 아직 이 사이트에 짧은 정적 별칭으로 등록되어 있지 않지만, openpilot 호환 대상이라면 표준 comma installer URL을 만들 수 있습니다.",
         rows: [
-          { label: "Input", value: parsed.sourceLabel },
-          { label: "Official installer URL", value: officialUrl, highlight: true },
-          { label: "Requested Git target", value: `https://github.com/${parsed.owner}/${parsed.repo}.git @ ${parsed.branch}` },
+          { label: "입력값", value: parsed.sourceLabel },
+          { label: "공식 installer URL", value: officialUrl, highlight: true },
+          { label: "요청한 Git 대상", value: `https://github.com/${parsed.owner}/${parsed.repo}.git @ ${parsed.branch}` },
         ],
         actions: [
-          { type: "copy", label: "Copy official URL", url: officialUrl },
-          { type: "open", label: "Open official URL", url: officialUrl },
+          { type: "copy", label: "공식 URL 복사", url: officialUrl },
+          { type: "open", label: "공식 URL 열기", url: officialUrl },
         ],
-        note: "If you want a shorter link on this site, add this branch to the static catalog and publish a new alias.",
+        note: "이 사이트에서 더 짧은 링크를 쓰려면, 이 브랜치를 정적 카탈로그에 추가하고 새 별칭을 발행해야 합니다.",
       }));
       return;
     }
 
     setResult(makeResultCard({
       tone: "info",
-      title: "No short link can be generated live here",
-      body: "This Pages site is static, so it cannot mint a new working short installer URL for an arbitrary branch on demand.",
+      title: "여기서는 즉석에서 짧은 링크를 만들 수 없습니다",
+      body: "이 Pages 사이트는 정적 호스팅이라서, 임의 브랜치에 대한 새 짧은 인스톨러 URL을 즉석에서 발급할 수 없습니다.",
       rows: [
-        { label: "Input", value: parsed.sourceLabel },
-        { label: "Requested Git target", value: `https://github.com/${parsed.owner}/${parsed.repo}.git @ ${parsed.branch}` },
+        { label: "입력값", value: parsed.sourceLabel },
+        { label: "요청한 Git 대상", value: `https://github.com/${parsed.owner}/${parsed.repo}.git @ ${parsed.branch}` },
       ],
       actions: [],
-      note: "For non-openpilot repos, slash-based branch paths, or any custom git target, publish a pre-generated installer in this catalog first.",
+      note: "non-openpilot repo, 슬래시가 들어간 브랜치 경로, 또는 커스텀 Git 대상은 먼저 이 카탈로그에 미리 생성된 인스톨러로 등록해야 합니다.",
     }));
   });
 }
@@ -387,7 +387,7 @@ async function bootstrap() {
     container.innerHTML = "";
 
     if (!Array.isArray(installers) || installers.length === 0) {
-      container.innerHTML = `<p class="empty-state">No installers have been generated yet.</p>`;
+      container.innerHTML = `<p class="empty-state">아직 생성된 인스톨러가 없습니다.</p>`;
       renderConverter([], { dynamicApiAvailable });
       return;
     }
@@ -398,7 +398,7 @@ async function bootstrap() {
     renderConverter(installers, { dynamicApiAvailable });
   } catch (error) {
     console.error(error);
-    container.innerHTML = `<p class="error-state">Failed to load installer catalog.</p>`;
+    container.innerHTML = `<p class="error-state">인스톨러 목록을 불러오지 못했습니다.</p>`;
   }
 }
 
