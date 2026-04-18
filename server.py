@@ -18,16 +18,61 @@ from installer_lib import (
   parse_branch_input,
 )
 
+FEATURED_ALIAS_PREFIXES = {
+  "https://github.com/ajouatom/openpilot.git": "cp",
+  "https://github.com/FrogAi/FrogPilot.git": "fp",
+  "https://github.com/sunnypilot/sunnypilot.git": "sp",
+  "https://github.com/commaai/openpilot.git": "op",
+}
+
+RESERVED_ALIASES = {
+  "",
+  "api",
+  "i",
+  "app.js",
+  "styles.css",
+  "installers.json",
+  "featured-branches.json",
+  "favicon.ico",
+}
+
 
 def encode_path_segment(value: str, keep_slashes: bool = False) -> str:
   safe = "/-._~" if keep_slashes else "-._~"
   return quote(value, safe=safe)
 
 
+def sanitize_branch_alias(branch: str) -> str:
+  normalized = branch.strip().replace("\\", "/")
+  parts = [part.strip().replace(" ", "-").replace("~", "-") for part in normalized.split("/") if part.strip()]
+  return "~".join(parts)
+
+
+def build_dynamic_alias(git_url: str, git_branch: str) -> str | None:
+  alias_core = sanitize_branch_alias(git_branch)
+  if not alias_core:
+    return None
+
+  prefix = FEATURED_ALIAS_PREFIXES.get(git_url)
+  alias = f"{prefix}-{alias_core}" if prefix else alias_core
+  if alias in RESERVED_ALIASES:
+    return None
+
+  return alias
+
+
+def get_preferred_alias(target: dict) -> str | None:
+  aliases = [alias for alias in target.get("aliases", []) if alias]
+  if not aliases:
+    return None
+  return sorted(aliases, key=lambda value: (len(value), value.lower()))[0]
+
+
 class BranchInstallerHTTPServer(ThreadingHTTPServer):
   def __init__(self, server_address: tuple[str, int], handler_class: type[SimpleHTTPRequestHandler]):
     super().__init__(server_address, handler_class)
     self.base_installer = fetch_base_installer()
+    self.alias_map: dict[str, dict[str, str]] = {}
 
 
 class BranchInstallerHandler(SimpleHTTPRequestHandler):
@@ -75,6 +120,16 @@ class BranchInstallerHandler(SimpleHTTPRequestHandler):
         self.serve_installer_for_target(target, head_only=head_only)
         return
 
+      alias_record = self.typed_server.alias_map.get(alias)
+      if alias_record is not None:
+        installer_bytes, _ = load_or_build_cached_installer(
+          self.typed_server.base_installer,
+          alias_record["git_url"],
+          alias_record["git_branch"],
+        )
+        self.serve_installer_bytes(installer_bytes, head_only=head_only)
+        return
+
     self.path = path
     if head_only:
       super().do_HEAD()
@@ -106,8 +161,9 @@ class BranchInstallerHandler(SimpleHTTPRequestHandler):
     targets = load_targets()
     published = find_target_by_git_ref(targets, git_url, git_branch)
 
-    if published is not None and published.get("aliases"):
-      path = "/" + encode_path_segment(published["aliases"][0])
+    preferred_alias = get_preferred_alias(published) if published is not None else None
+    if preferred_alias is not None:
+      path = "/" + encode_path_segment(preferred_alias)
       self.send_json(200, {
         "mode": "published",
         "installer_url": self.absolute_url(path),
@@ -117,11 +173,20 @@ class BranchInstallerHandler(SimpleHTTPRequestHandler):
       }, head_only=head_only)
       return
 
-    path = "/i/{owner}/{repo}/{branch}".format(
-      owner=encode_path_segment(parsed_input["owner"]),
-      repo=encode_path_segment(parsed_input["repo"]),
-      branch=encode_path_segment(parsed_input["branch"], keep_slashes=True),
-    )
+    alias = build_dynamic_alias(git_url, git_branch)
+    if alias is not None:
+      self.typed_server.alias_map[alias] = {
+        "git_url": git_url,
+        "git_branch": git_branch,
+      }
+      path = "/" + encode_path_segment(alias)
+    else:
+      path = "/i/{owner}/{repo}/{branch}".format(
+        owner=encode_path_segment(parsed_input["owner"]),
+        repo=encode_path_segment(parsed_input["repo"]),
+        branch=encode_path_segment(parsed_input["branch"], keep_slashes=True),
+      )
+
     self.send_json(200, {
       "mode": "dynamic",
       "installer_url": self.absolute_url(path),

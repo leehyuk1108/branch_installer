@@ -1,0 +1,38 @@
+[
+  {
+    "id": "carrotpilot",
+    "name": "당근파일럿",
+    "owner": "ajouatom",
+    "repo": "openpilot",
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "kicker": "브랜치 선택",
+    "alias_prefix": "cp"
+  },
+  {
+    "id": "frogpilot",
+    "name": "FrogPilot",
+    "owner": "FrogAi",
+    "repo": "FrogPilot",
+    "git_url": "https://github.com/FrogAi/FrogPilot.git",
+    "kicker": "브랜치 선택",
+    "alias_prefix": "fp"
+  },
+  {
+    "id": "sunnypilot",
+    "name": "SunnyPilot",
+    "owner": "sunnypilot",
+    "repo": "sunnypilot",
+    "git_url": "https://github.com/sunnypilot/sunnypilot.git",
+    "kicker": "브랜치 선택",
+    "alias_prefix": "sp"
+  },
+  {
+    "id": "openpilot",
+    "name": "openpilot",
+    "owner": "commaai",
+    "repo": "openpilot",
+    "git_url": "https://github.com/commaai/openpilot.git",
+    "kicker": "브랜치 선택",
+    "alias_prefix": "op"
+  }
+]

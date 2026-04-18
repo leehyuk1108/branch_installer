@@ -15,6 +15,7 @@ type ParsedInput =
 type InstallerRecord = {
   git_url: string;
   git_branch: string;
+  aliases?: string[] | null;
   short_download_path?: string | null;
 };
 
@@ -30,6 +31,12 @@ const DEFAULT_INSTALLER_DEVICE_TYPE = "tizi";
 const URL_SLOT_PATTERN = /https:\/\/github\.com\/commaai\/openpilot\.git\?[ ]+/;
 const BRANCH_SLOT_PATTERN = /release3\?[ ]+/;
 const ALIAS_STORE_NAME = "branch-installer-aliases";
+const FEATURED_ALIAS_PREFIXES = new Map<string, string>([
+  ["https://github.com/ajouatom/openpilot.git", "cp"],
+  ["https://github.com/FrogAi/FrogPilot.git", "fp"],
+  ["https://github.com/sunnypilot/sunnypilot.git", "sp"],
+  ["https://github.com/commaai/openpilot.git", "op"],
+]);
 const RESERVED_ALIASES = new Set([
   "",
   "api",
@@ -37,6 +44,7 @@ const RESERVED_ALIASES = new Set([
   "app.js",
   "styles.css",
   "installers.json",
+  "featured-branches.json",
   "favicon.ico",
 ]);
 
@@ -151,17 +159,34 @@ const encodeBranchPath = (branch: string) =>
     .map((part) => encodeURIComponent(part))
     .join("/");
 
-const buildBranchAlias = (branch: string) => {
-  const alias = branch
+const sanitizeBranchAlias = (branch: string) =>
+  branch
     .trim()
-    .replace(/[\\/]+/g, "-")
-    .replace(/\s+/g, "-");
+    .replace(/\\/g, "/")
+    .split("/")
+    .map((part) => part.trim().replace(/\s+/g, "-").replace(/~/g, "-"))
+    .filter(Boolean)
+    .join("~");
+
+const buildBranchAlias = (gitUrl: string, branch: string) => {
+  const aliasCore = sanitizeBranchAlias(branch);
+  const prefix = FEATURED_ALIAS_PREFIXES.get(gitUrl);
+  const alias = prefix ? `${prefix}-${aliasCore}` : aliasCore;
 
   if (!alias || RESERVED_ALIASES.has(alias)) {
     return null;
   }
 
   return alias;
+};
+
+const getPreferredPublishedAlias = (installer: InstallerRecord) => {
+  const aliases = Array.isArray(installer.aliases) ? installer.aliases.filter(Boolean) : [];
+  if (aliases.length > 0) {
+    return [...aliases].sort((left, right) => left.length - right.length || left.localeCompare(right))[0];
+  }
+
+  return installer.short_download_path ?? null;
 };
 
 const getAliasStore = () => {
@@ -295,8 +320,9 @@ const handleResolve = async (request: Request, url: URL) => {
 
   const gitUrl = `https://github.com/${parsed.owner}/${parsed.repo}.git`;
   const published = await findPublishedInstaller(request, gitUrl, parsed.branch);
-  if (published?.short_download_path) {
-    const shortPath = `/${published.short_download_path}`;
+  const preferredPublishedAlias = published ? getPreferredPublishedAlias(published) : null;
+  if (preferredPublishedAlias) {
+    const shortPath = `/${preferredPublishedAlias}`;
     return jsonResponse({
       mode: "published",
       installer_url: new URL(shortPath, request.url).toString(),
@@ -306,7 +332,7 @@ const handleResolve = async (request: Request, url: URL) => {
     });
   }
 
-  const alias = buildBranchAlias(parsed.branch);
+  const alias = buildBranchAlias(gitUrl, parsed.branch);
   if (alias) {
     await rememberAlias(alias, gitUrl, parsed.branch);
     const shortPath = `/${encodeURIComponent(alias)}`;

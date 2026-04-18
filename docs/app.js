@@ -2,40 +2,6 @@ function toAbsoluteDownloadUrl(path) {
   return new URL(path, window.location.href).toString();
 }
 
-const FEATURED_GROUPS = [
-  {
-    id: "carrotpilot",
-    name: "당근파일럿",
-    gitUrl: "https://github.com/ajouatom/openpilot.git",
-    mode: "picker",
-    kicker: "브랜치 선택",
-  },
-  {
-    id: "frogpilot",
-    name: "FrogPilot",
-    gitUrl: "https://github.com/FrogAi/FrogPilot.git",
-    mode: "single",
-    branch: "FrogPilot",
-    kicker: "기본 브랜치",
-  },
-  {
-    id: "sunnypilot",
-    name: "SunnyPilot",
-    gitUrl: "https://github.com/sunnypilot/sunnypilot.git",
-    mode: "single",
-    branch: "master",
-    kicker: "기본 브랜치",
-  },
-  {
-    id: "openpilot",
-    name: "openpilot",
-    gitUrl: "https://github.com/commaai/openpilot.git",
-    mode: "single",
-    branch: "master",
-    kicker: "기본 브랜치",
-  },
-];
-
 function escapeHtml(value) {
   return value
     .replaceAll("&", "&amp;")
@@ -242,11 +208,16 @@ function getPreferredShortPath(installer) {
   return `/${installer.download_path}`;
 }
 
-function getInstallersForGroup(group, installerCatalog) {
-  return installerCatalog
-    .filter((installer) => installer.git_url === group.gitUrl)
-    .filter((installer) => !group.branch || installer.git_branch === group.branch)
-    .sort((left, right) => left.git_branch.localeCompare(right.git_branch, "en", { numeric: true }));
+function findInstallerByGitRef(installerCatalog, gitUrl, gitBranch) {
+  return installerCatalog.find((installer) => installer.git_url === gitUrl && installer.git_branch === gitBranch) || null;
+}
+
+function buildGithubBranchUrl(group, branch) {
+  const encodedBranch = branch
+    .split("/")
+    .map((part) => encodeURIComponent(part))
+    .join("/");
+  return `https://github.com/${group.owner}/${group.repo}/tree/${encodedBranch}`;
 }
 
 function createGroupShell(group) {
@@ -261,7 +232,7 @@ function createGroupShell(group) {
   return wrapper;
 }
 
-function createPickerGroup(group, installers) {
+function createPickerGroup(group, installerCatalog, dynamicApiAvailable) {
   const wrapper = createGroupShell(group);
   const picker = document.createElement("div");
   picker.className = "branch-picker";
@@ -285,7 +256,9 @@ function createPickerGroup(group, installers) {
     result.appendChild(node);
   };
 
-  if (installers.length === 0) {
+  const branches = Array.isArray(group.branches) ? group.branches : [];
+
+  if (branches.length === 0) {
     select.innerHTML = '<option value="">표시할 브랜치가 없습니다.</option>';
     setResult(makeResultCard({
       tone: "info",
@@ -305,12 +278,12 @@ function createPickerGroup(group, installers) {
   select.appendChild(placeholder);
 
   const branchMap = new Map();
-  installers.forEach((installer) => {
+  branches.forEach((branch) => {
     const option = document.createElement("option");
-    option.value = installer.git_branch;
-    option.textContent = installer.git_branch;
+    option.value = branch;
+    option.textContent = branch;
     select.appendChild(option);
-    branchMap.set(installer.git_branch, installer);
+    branchMap.set(branch, branch);
   });
 
   setResult(makeResultCard({
@@ -321,9 +294,9 @@ function createPickerGroup(group, installers) {
     actions: [],
   }));
 
-  select.addEventListener("change", () => {
-    const installer = branchMap.get(select.value);
-    if (!installer) {
+  select.addEventListener("change", async () => {
+    const branch = branchMap.get(select.value);
+    if (!branch) {
       setResult(makeResultCard({
         tone: "info",
         title: "안내",
@@ -334,21 +307,74 @@ function createPickerGroup(group, installers) {
       return;
     }
 
-    const shortPath = getPreferredShortPath(installer);
-    const downloadUrl = toAbsoluteDownloadUrl(shortPath);
+    const published = findInstallerByGitRef(installerCatalog, group.git_url, branch);
+    if (published) {
+      const shortPath = getPreferredShortPath(published);
+      const downloadUrl = toAbsoluteDownloadUrl(shortPath);
+      setResult(makeResultCard({
+        tone: "success",
+        title: `${group.name} ${branch}`,
+        rows: [
+          { label: "링크", value: downloadUrl, highlight: true },
+          { label: "브랜치", value: branch },
+        ],
+        actions: [
+          { type: "copy", label: "복사", url: downloadUrl },
+          { type: "open", label: "열기", url: downloadUrl },
+        ],
+      }));
+      return;
+    }
+
+    if (!dynamicApiAvailable) {
+      setResult(makeResultCard({
+        tone: "warning",
+        title: "로컬 정적 미리보기",
+        body: "동적 링크 생성은 API가 켜진 서버에서 확인할 수 있습니다.",
+        rows: [
+          { label: "브랜치", value: branch },
+        ],
+        actions: [],
+      }));
+      return;
+    }
 
     setResult(makeResultCard({
-      tone: "success",
-      title: `${group.name} ${installer.git_branch}`,
+      tone: "info",
+      title: "링크 생성 중",
+      body: "짧은 링크를 만들고 있습니다.",
       rows: [
-        { label: "링크", value: downloadUrl, highlight: true },
-        { label: "브랜치", value: installer.git_branch },
+        { label: "브랜치", value: branch },
       ],
-      actions: [
-        { type: "copy", label: "복사", url: downloadUrl },
-        { type: "open", label: "열기", url: downloadUrl },
-      ],
+      actions: [],
     }));
+
+    try {
+      const resolved = await resolveDynamicInstaller(buildGithubBranchUrl(group, branch));
+      setResult(makeResultCard({
+        tone: "success",
+        title: `${group.name} ${branch}`,
+        rows: [
+          { label: "링크", value: resolved.installer_url, highlight: true },
+          { label: "브랜치", value: branch },
+        ],
+        actions: [
+          { type: "copy", label: "복사", url: resolved.installer_url },
+          { type: "open", label: "열기", url: resolved.installer_url },
+        ],
+      }));
+    } catch (error) {
+      console.error(error);
+      setResult(makeResultCard({
+        tone: "warning",
+        title: "링크 생성 실패",
+        body: "이 브랜치의 링크를 만들지 못했습니다.",
+        rows: [
+          { label: "브랜치", value: branch },
+        ],
+        actions: [],
+      }));
+    }
   });
 
   wrapper.appendChild(picker);
@@ -356,40 +382,7 @@ function createPickerGroup(group, installers) {
   return wrapper;
 }
 
-function createSingleGroup(group, installers) {
-  const wrapper = createGroupShell(group);
-  const installer = installers[0];
-
-  if (!installer) {
-    wrapper.appendChild(makeResultCard({
-      tone: "info",
-      title: "안내",
-      body: "표시할 브랜치가 없습니다.",
-      rows: [],
-      actions: [],
-    }));
-    return wrapper;
-  }
-
-  const shortPath = getPreferredShortPath(installer);
-  const downloadUrl = toAbsoluteDownloadUrl(shortPath);
-  wrapper.appendChild(makeResultCard({
-    tone: "success",
-    title: `${group.name} 기본 브랜치`,
-    rows: [
-      { label: "링크", value: downloadUrl, highlight: true },
-      { label: "브랜치", value: installer.git_branch },
-    ],
-    actions: [
-      { type: "copy", label: "복사", url: downloadUrl },
-      { type: "open", label: "열기", url: downloadUrl },
-    ],
-  }));
-
-  return wrapper;
-}
-
-function renderFeaturedGroups(installerCatalog) {
+function renderFeaturedGroups(featuredGroups, installerCatalog, options = {}) {
   const container = document.getElementById("featured-groups");
   if (!container) {
     return;
@@ -397,11 +390,16 @@ function renderFeaturedGroups(installerCatalog) {
 
   container.innerHTML = "";
 
-  FEATURED_GROUPS.forEach((group) => {
-    const installers = getInstallersForGroup(group, installerCatalog);
-    const card = group.mode === "picker"
-      ? createPickerGroup(group, installers)
-      : createSingleGroup(group, installers);
+  const groups = Array.isArray(featuredGroups) ? featuredGroups : [];
+  const dynamicApiAvailable = options.dynamicApiAvailable === true;
+
+  if (groups.length === 0) {
+    container.innerHTML = '<p class="empty-state">표시할 브랜치가 없습니다.</p>';
+    return;
+  }
+
+  groups.forEach((group) => {
+    const card = createPickerGroup(group, installerCatalog, dynamicApiAvailable);
     container.appendChild(card);
   });
 }
@@ -507,19 +505,28 @@ async function bootstrap() {
   const dynamicApiAvailable = await checkDynamicApi();
 
   try {
-    const response = await fetch("./installers.json", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Failed to load installers.json: ${response.status}`);
+    const [installerResponse, featuredResponse] = await Promise.all([
+      fetch("./installers.json", { cache: "no-store" }),
+      fetch("./featured-branches.json", { cache: "no-store" }),
+    ]);
+
+    if (!installerResponse.ok) {
+      throw new Error(`Failed to load installers.json: ${installerResponse.status}`);
     }
 
-    const installers = await response.json();
+    if (!featuredResponse.ok) {
+      throw new Error(`Failed to load featured-branches.json: ${featuredResponse.status}`);
+    }
+
+    const installers = await installerResponse.json();
+    const featuredGroups = await featuredResponse.json();
     const installerCatalog = Array.isArray(installers) ? installers : [];
     renderConverter(installerCatalog, { dynamicApiAvailable });
-    renderFeaturedGroups(installerCatalog);
+    renderFeaturedGroups(featuredGroups, installerCatalog, { dynamicApiAvailable });
   } catch (error) {
     console.error(error);
     renderConverter([], { dynamicApiAvailable });
-    renderFeaturedGroups([]);
+    renderFeaturedGroups([], [], { dynamicApiAvailable });
   }
 }
 
