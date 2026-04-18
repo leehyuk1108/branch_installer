@@ -138,6 +138,24 @@ body::before {
   letter-spacing: -0.02em;
 }
 
+.branch-panel-heading {
+  display: grid;
+  gap: 8px;
+}
+
+.branch-panel-title {
+  font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.branch-panel-copy {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
 .converter-form,
 .converter-result,
 .branch-picker,

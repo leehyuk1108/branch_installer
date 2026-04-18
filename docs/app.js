@@ -52,7 +52,7 @@ function renderActions(urls) {
 function parseBranchInput(rawValue) {
   const raw = rawValue.trim();
   if (!raw) {
-    return { error: "링크를 입력해주세요." };
+    return { error: "브랜치 Github URL을 입력해주세요." };
   }
 
   const ownerRepoBranchMatch = raw.match(/^([^/]+)\/([^/]+)\/(.+)$/);
@@ -87,7 +87,7 @@ function parseBranchInput(rawValue) {
 
   if (host === "github.com") {
     if (parts.length < 4 || parts[2] !== "tree") {
-      return { error: "브랜치 링크를 넣어주세요." };
+      return { error: "브랜치 Github URL을 넣어주세요." };
     }
 
     return {
@@ -289,7 +289,7 @@ function createPickerGroup(group, installerCatalog, dynamicApiAvailable) {
   setResult(makeResultCard({
     tone: "info",
     title: "안내",
-    body: "브랜치를 선택하면 짧은 링크가 나옵니다.",
+    body: "브랜치를 선택하면 설치 링크가 출력됩니다.",
     rows: [],
     actions: [],
   }));
@@ -300,7 +300,7 @@ function createPickerGroup(group, installerCatalog, dynamicApiAvailable) {
       setResult(makeResultCard({
         tone: "info",
         title: "안내",
-        body: "브랜치를 선택하면 짧은 링크가 나옵니다.",
+        body: "브랜치를 선택하면 설치 링크가 출력됩니다.",
         rows: [],
         actions: [],
       }));
