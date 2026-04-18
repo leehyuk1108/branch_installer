@@ -49,40 +49,6 @@ function renderActions(urls) {
   return actions;
 }
 
-function renderInstallerCard(installer) {
-  const article = document.createElement("article");
-  article.className = "installer-card";
-
-  const shortUrl = installer.short_download_path
-    ? toAbsoluteDownloadUrl(installer.short_download_path)
-    : null;
-  const preferredUrl = shortUrl || toAbsoluteDownloadUrl(installer.download_path);
-
-  article.innerHTML = `
-    <div class="meta-grid">
-      <p class="panel-kicker">${escapeHtml(installer.slug_owner)}/${escapeHtml(installer.slug_branch)}</p>
-      <h3>${escapeHtml(installer.title)}</h3>
-    </div>
-    <div class="meta-grid">
-      <div class="meta-row">
-        <span class="meta-label">링크</span>
-        <div class="url-box mono">${escapeHtml(preferredUrl)}</div>
-      </div>
-      <div class="meta-row">
-        <span class="meta-label">대상</span>
-        <div class="mono">${escapeHtml(installer.git_url)} @ ${escapeHtml(installer.git_branch)}</div>
-      </div>
-    </div>
-  `;
-
-  article.appendChild(renderActions([
-    { type: "copy", label: "복사", url: preferredUrl },
-    { type: "open", label: "열기", url: preferredUrl },
-  ]));
-
-  return article;
-}
-
 function parseBranchInput(rawValue) {
   const raw = rawValue.trim();
   if (!raw) {
@@ -332,7 +298,6 @@ function renderConverter(installerCatalog, options = {}) {
 }
 
 async function bootstrap() {
-  const container = document.getElementById("installer-list");
   const dynamicApiAvailable = await checkDynamicApi();
 
   try {
@@ -342,21 +307,10 @@ async function bootstrap() {
     }
 
     const installers = await response.json();
-    container.innerHTML = "";
-
-    if (!Array.isArray(installers) || installers.length === 0) {
-      container.innerHTML = `<p class="empty-state">등록된 링크가 없습니다.</p>`;
-      renderConverter([], { dynamicApiAvailable });
-      return;
-    }
-
-    installers.forEach((installer) => {
-      container.appendChild(renderInstallerCard(installer));
-    });
-    renderConverter(installers, { dynamicApiAvailable });
+    renderConverter(Array.isArray(installers) ? installers : [], { dynamicApiAvailable });
   } catch (error) {
     console.error(error);
-    container.innerHTML = `<p class="error-state">불러오지 못했습니다.</p>`;
+    renderConverter([], { dynamicApiAvailable });
   }
 }
 
