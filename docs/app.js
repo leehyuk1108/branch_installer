@@ -232,7 +232,7 @@ function renderFeaturedBranchPicker(installerCatalog) {
     select.innerHTML = '<option value="">표시할 브랜치가 없습니다.</option>';
     setResult(makeResultCard({
       tone: "info",
-      title: FEATURED_REPO_NAME,
+      title: "안내",
       body: "표시할 브랜치가 없습니다.",
       rows: [],
       actions: [],
@@ -259,7 +259,7 @@ function renderFeaturedBranchPicker(installerCatalog) {
 
   setResult(makeResultCard({
     tone: "info",
-    title: FEATURED_REPO_NAME,
+    title: "안내",
     body: "브랜치를 선택하면 짧은 링크가 나옵니다.",
     rows: [],
     actions: [],
@@ -270,7 +270,7 @@ function renderFeaturedBranchPicker(installerCatalog) {
     if (!installer) {
       setResult(makeResultCard({
         tone: "info",
-        title: FEATURED_REPO_NAME,
+        title: "안내",
         body: "브랜치를 선택하면 짧은 링크가 나옵니다.",
         rows: [],
         actions: [],
