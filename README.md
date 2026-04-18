@@ -90,7 +90,7 @@ https://<도메인>/installers/<owner>/<branch>/installer
 ### 1. 설치 파일 다시 만들기
 
 ```bash
-cd /Users/ijonghyeog/Desktop/Coding/branch_installer
+cd branch_installer
 python3 scripts/generate_installers.py
 ```
 
@@ -104,7 +104,7 @@ python3 scripts/generate_installers.py
 ### 2. 로컬에서 사이트 열기
 
 ```bash
-cd /Users/ijonghyeog/Desktop/Coding/branch_installer
+cd branch_installer
 python3 server.py --host 127.0.0.1 --port 8130
 ```
 
@@ -122,7 +122,7 @@ http://127.0.0.1:8130
 ### 3. Netlify 로컬 모드로 확인하기
 
 ```bash
-cd /Users/ijonghyeog/Desktop/Coding/branch_installer
+cd branch_installer
 npm install
 npm run netlify:dev
 ```
