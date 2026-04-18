@@ -3,95 +3,56 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>브랜치 인스톨러</title>
-    <meta name="description" content="짧은 별칭과 동적 생성 기능을 지원하는 comma 인스톨러 사이트입니다.">
+    <title>설치 링크 변환기</title>
+    <meta name="description" content="브랜치 링크를 설치 링크로 변환합니다.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
     <div class="page-shell">
       <header class="hero">
-        <p class="eyebrow">Comma 인스톨러 호스팅</p>
-        <h1>branch_installer</h1>
-        <p class="hero-copy">
-          사람이 보기 쉬운 카탈로그와 실제 설치에 쓰이는 ELF 인스톨러 파일을 함께 제공합니다.
-          comma 기기에는 이 페이지 주소가 아니라 짧은 별칭 또는 직접 인스톨러 URL을 넣어야 합니다.
-        </p>
-        <div class="hero-callouts">
-          <div class="callout">
-            <span class="callout-label">지원 방식</span>
-            <strong>짧은 게시 별칭 링크</strong>
-          </div>
-          <div class="callout">
-            <span class="callout-label">서버 모드</span>
-            <strong>요청 시 즉시 생성</strong>
-          </div>
-        </div>
+        <p class="eyebrow">콤마 인스톨러</p>
+        <h1>설치 링크 변환기</h1>
+        <p class="hero-copy">브랜치 링크를 넣으면 설치 링크로 변환합니다.</p>
       </header>
 
-      <section class="panel converter-panel">
-        <div class="panel-heading">
-          <p class="panel-kicker">브랜치 변환기</p>
-          <h2>브랜치 링크를 넣어주세요</h2>
-        </div>
-        <form id="converter-form" class="converter-form">
-          <label class="converter-label" for="branch-input">
-            GitHub 브랜치 URL, 공식 installer URL, <code>owner/branch</code>, 또는 <code>owner/repo/branch</code> 형식을 넣을 수 있습니다.
-          </label>
-          <div class="converter-controls">
-            <input
-              id="branch-input"
-              class="converter-input"
-              type="text"
-              name="branch-input"
-              placeholder="https://github.com/leehyuk1108/sunny-hl/tree/release-c3-hl"
-              autocomplete="off"
-              spellcheck="false"
-            >
-            <button type="submit" class="action-button action-primary">변환</button>
-          </div>
-          <p class="converter-hint">
-            브랜치 안의 파일 URL보다 브랜치 루트 URL을 넣는 것이 가장 정확합니다.
-          </p>
-        </form>
-        <div id="converter-result" class="converter-result">
-          <p class="empty-state">
-            예시: <code>https://github.com/leehyuk1108/sunny-hl/tree/release-c3-hl</code> 를 넣으면, 등록된 짧은 별칭이 있을 때 바로 보여줍니다.
-          </p>
-        </div>
-      </section>
-
-      <main class="layout">
-        <section class="panel panel-primary">
+      <main class="stack">
+        <section class="panel converter-panel">
           <div class="panel-heading">
-            <p class="panel-kicker">등록된 인스톨러</p>
-            <h2>바로 사용할 수 있는 링크</h2>
+            <p class="panel-kicker">변환</p>
+            <h2>브랜치 링크</h2>
           </div>
-          <div id="installer-list" class="installer-list">
-            <p class="loading">인스톨러 목록을 불러오는 중…</p>
+          <form id="converter-form" class="converter-form">
+            <label class="sr-only" for="branch-input">브랜치 링크</label>
+            <div class="converter-controls">
+              <input
+                id="branch-input"
+                class="converter-input"
+                type="text"
+                name="branch-input"
+                placeholder="GitHub 브랜치 링크 또는 owner/repo/branch"
+                autocomplete="off"
+                spellcheck="false"
+              >
+              <button type="submit" class="action-button action-primary">변환</button>
+            </div>
+          </form>
+          <div id="converter-result" class="converter-result">
+            <p class="empty-state">링크를 넣어주세요.</p>
           </div>
         </section>
 
-        <aside class="panel panel-secondary">
+        <section class="panel panel-primary">
           <div class="panel-heading">
-            <p class="panel-kicker">사용 방법</p>
-            <h2>기기 설치 흐름</h2>
+            <p class="panel-kicker">목록</p>
+            <h2>등록된 링크</h2>
           </div>
-          <ol class="steps">
-            <li>카드를 열고 직접 인스톨러 URL을 복사합니다.</li>
-            <li>comma 기기에서 <code>Custom Software</code>를 선택합니다.</li>
-            <li>직접 <code>/installer</code> URL을 붙여넣습니다.</li>
-            <li>기기가 ELF 인스톨러를 받은 뒤, 그 인스톨러가 대상 Git 브랜치를 clone 합니다.</li>
-          </ol>
-          <div class="warning-box">
-            <p class="warning-title">주의</p>
-            <p>
-              GitHub Pages는 정적 호스팅입니다. 임의 repo를 즉시 생성하려면 별도 서버 모드 또는 Netlify Functions를 사용해야 합니다.
-            </p>
+          <div id="installer-list" class="installer-list">
+            <p class="loading">불러오는 중…</p>
           </div>
-        </aside>
+        </section>
       </main>
     </div>
 
