@@ -1,15 +1,137 @@
 [
   {
     "slug_owner": "ajouatom",
+    "slug_branch": "apilot-c2",
+    "aliases": [
+      "apilot-c2"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "apilot-c2",
+    "title": "ajouatom/openpilot apilot-c2",
+    "description": "ajouatom/openpilot의 apilot-c2 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c3-prebuilt-260322",
+    "aliases": [
+      "c3-prebuilt-260322"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c3-prebuilt-260322",
+    "title": "ajouatom/openpilot c3-prebuilt-260322",
+    "description": "ajouatom/openpilot의 c3-prebuilt-260322 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c3-v9",
+    "aliases": [
+      "c3-v9"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c3-v9",
+    "title": "ajouatom/openpilot c3-v9",
+    "description": "ajouatom/openpilot의 c3-v9 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c3-wip",
+    "aliases": [
+      "c3-wip"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c3-wip",
+    "title": "ajouatom/openpilot c3-wip",
+    "description": "ajouatom/openpilot의 c3-wip 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c4-prebuilt-260322",
+    "aliases": [
+      "c4-prebuilt-260322"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c4-prebuilt-260322",
+    "title": "ajouatom/openpilot c4-prebuilt-260322",
+    "description": "ajouatom/openpilot의 c4-prebuilt-260322 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c4-prebuilt-260404",
+    "aliases": [
+      "c4-prebuilt-260404"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c4-prebuilt-260404",
+    "title": "ajouatom/openpilot c4-prebuilt-260404",
+    "description": "ajouatom/openpilot의 c4-prebuilt-260404 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c4-wip",
+    "aliases": [
+      "c4-wip"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c4-wip",
+    "title": "ajouatom/openpilot c4-wip",
+    "description": "ajouatom/openpilot의 c4-wip 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c4-wip-op9",
+    "aliases": [
+      "c4-wip-op9"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c4-wip-op9",
+    "title": "ajouatom/openpilot c4-wip-op9",
+    "description": "ajouatom/openpilot의 c4-wip-op9 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
     "slug_branch": "carrot-wip",
     "aliases": [
+      "carrot-wip",
       "c",
       "cw"
     ],
     "git_url": "https://github.com/ajouatom/openpilot.git",
     "git_branch": "carrot-wip",
-    "title": "CarrotPilot WIP",
+    "title": "ajouatom/openpilot carrot-wip",
     "description": "ajouatom/openpilot의 carrot-wip 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "carrot-wip-pv5",
+    "aliases": [
+      "carrot-wip-pv5"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "carrot-wip-pv5",
+    "title": "ajouatom/openpilot carrot-wip-pv5",
+    "description": "ajouatom/openpilot의 carrot-wip-pv5 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "carrot-wip-ui",
+    "aliases": [
+      "carrot-wip-ui"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "carrot-wip-ui",
+    "title": "ajouatom/openpilot carrot-wip-ui",
+    "description": "ajouatom/openpilot의 carrot-wip-ui 브랜치를 위한 정적 인스톨러입니다."
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "carrot2-v9",
+    "aliases": [
+      "carrot2-v9"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "carrot2-v9",
+    "title": "ajouatom/openpilot carrot2-v9",
+    "description": "ajouatom/openpilot의 carrot2-v9 브랜치를 위한 정적 인스톨러입니다."
   },
   {
     "slug_owner": "leehyuk1108",

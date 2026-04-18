@@ -1,19 +1,196 @@
 [
   {
     "slug_owner": "ajouatom",
+    "slug_branch": "apilot-c2",
+    "aliases": [
+      "apilot-c2"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "apilot-c2",
+    "title": "ajouatom/openpilot apilot-c2",
+    "description": "ajouatom/openpilot\uc758 apilot-c2 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/apilot-c2/installer",
+    "download_url_hint": "/installers/ajouatom/apilot-c2/installer",
+    "short_download_path": "apilot-c2",
+    "sha256": "679610183bf95540ac745f342f8f8a14f058add5f1906ea08c557722d37eee5b",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c3-prebuilt-260322",
+    "aliases": [
+      "c3-prebuilt-260322"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c3-prebuilt-260322",
+    "title": "ajouatom/openpilot c3-prebuilt-260322",
+    "description": "ajouatom/openpilot\uc758 c3-prebuilt-260322 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/c3-prebuilt-260322/installer",
+    "download_url_hint": "/installers/ajouatom/c3-prebuilt-260322/installer",
+    "short_download_path": "c3-prebuilt-260322",
+    "sha256": "5393221f9747770391fdca9b2c827a4d4025914558ed7458457a61ec52a73ad3",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c3-v9",
+    "aliases": [
+      "c3-v9"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c3-v9",
+    "title": "ajouatom/openpilot c3-v9",
+    "description": "ajouatom/openpilot\uc758 c3-v9 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/c3-v9/installer",
+    "download_url_hint": "/installers/ajouatom/c3-v9/installer",
+    "short_download_path": "c3-v9",
+    "sha256": "76ea8f18f6d3afacfe973adedbad37b23e9f967f85aa51fcc896ed18e9389852",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c3-wip",
+    "aliases": [
+      "c3-wip"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c3-wip",
+    "title": "ajouatom/openpilot c3-wip",
+    "description": "ajouatom/openpilot\uc758 c3-wip \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/c3-wip/installer",
+    "download_url_hint": "/installers/ajouatom/c3-wip/installer",
+    "short_download_path": "c3-wip",
+    "sha256": "6ce7d2dabffef919442d5d12a86ec725d56f9342c0d44b23b5c1e5afde73011e",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c4-prebuilt-260322",
+    "aliases": [
+      "c4-prebuilt-260322"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c4-prebuilt-260322",
+    "title": "ajouatom/openpilot c4-prebuilt-260322",
+    "description": "ajouatom/openpilot\uc758 c4-prebuilt-260322 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/c4-prebuilt-260322/installer",
+    "download_url_hint": "/installers/ajouatom/c4-prebuilt-260322/installer",
+    "short_download_path": "c4-prebuilt-260322",
+    "sha256": "e56014127b5c637323402690df3353d27c08491ce244592b84ba9dce48871966",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c4-prebuilt-260404",
+    "aliases": [
+      "c4-prebuilt-260404"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c4-prebuilt-260404",
+    "title": "ajouatom/openpilot c4-prebuilt-260404",
+    "description": "ajouatom/openpilot\uc758 c4-prebuilt-260404 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/c4-prebuilt-260404/installer",
+    "download_url_hint": "/installers/ajouatom/c4-prebuilt-260404/installer",
+    "short_download_path": "c4-prebuilt-260404",
+    "sha256": "f63d2dc2b65209084565fd5dd9574a858995fb923f653c8b64f0b6d608242cce",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c4-wip",
+    "aliases": [
+      "c4-wip"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c4-wip",
+    "title": "ajouatom/openpilot c4-wip",
+    "description": "ajouatom/openpilot\uc758 c4-wip \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/c4-wip/installer",
+    "download_url_hint": "/installers/ajouatom/c4-wip/installer",
+    "short_download_path": "c4-wip",
+    "sha256": "a510dbaae8ac1026f86157a1733563fa3bab19ae8300f19df45e24d5cf1ca64a",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "c4-wip-op9",
+    "aliases": [
+      "c4-wip-op9"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "c4-wip-op9",
+    "title": "ajouatom/openpilot c4-wip-op9",
+    "description": "ajouatom/openpilot\uc758 c4-wip-op9 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/c4-wip-op9/installer",
+    "download_url_hint": "/installers/ajouatom/c4-wip-op9/installer",
+    "short_download_path": "c4-wip-op9",
+    "sha256": "bc671327dffb9ef2dc4091269ea221ca8d9dadf658b3c8fb4f9930aadbfdf29c",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
     "slug_branch": "carrot-wip",
     "aliases": [
+      "carrot-wip",
       "c",
       "cw"
     ],
     "git_url": "https://github.com/ajouatom/openpilot.git",
     "git_branch": "carrot-wip",
-    "title": "CarrotPilot WIP",
+    "title": "ajouatom/openpilot carrot-wip",
     "description": "ajouatom/openpilot\uc758 carrot-wip \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
     "download_path": "installers/ajouatom/carrot-wip/installer",
     "download_url_hint": "/installers/ajouatom/carrot-wip/installer",
-    "short_download_path": "c",
+    "short_download_path": "carrot-wip",
     "sha256": "c2795676b0aaccf6b7e3ad347a8dbf26b6426b146933182b7436c37cf91092c9",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "carrot-wip-pv5",
+    "aliases": [
+      "carrot-wip-pv5"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "carrot-wip-pv5",
+    "title": "ajouatom/openpilot carrot-wip-pv5",
+    "description": "ajouatom/openpilot\uc758 carrot-wip-pv5 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/carrot-wip-pv5/installer",
+    "download_url_hint": "/installers/ajouatom/carrot-wip-pv5/installer",
+    "short_download_path": "carrot-wip-pv5",
+    "sha256": "72ce877ac858342e7c16f46b22a5c206f2570f1899dcbc156896a18ad7b35bf7",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "carrot-wip-ui",
+    "aliases": [
+      "carrot-wip-ui"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "carrot-wip-ui",
+    "title": "ajouatom/openpilot carrot-wip-ui",
+    "description": "ajouatom/openpilot\uc758 carrot-wip-ui \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/carrot-wip-ui/installer",
+    "download_url_hint": "/installers/ajouatom/carrot-wip-ui/installer",
+    "short_download_path": "carrot-wip-ui",
+    "sha256": "38609bb511e2746bfe04362ac04cdf1ec7935e73c1dec948fb73d3e0507ccc9d",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "ajouatom",
+    "slug_branch": "carrot2-v9",
+    "aliases": [
+      "carrot2-v9"
+    ],
+    "git_url": "https://github.com/ajouatom/openpilot.git",
+    "git_branch": "carrot2-v9",
+    "title": "ajouatom/openpilot carrot2-v9",
+    "description": "ajouatom/openpilot\uc758 carrot2-v9 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/ajouatom/carrot2-v9/installer",
+    "download_url_hint": "/installers/ajouatom/carrot2-v9/installer",
+    "short_download_path": "carrot2-v9",
+    "sha256": "a94786a5cfc9c68bacb4245bde58cc1eab2b1dc3a3dae71adee356f7c62ea1e4",
     "size_bytes": 1270680
   },
   {

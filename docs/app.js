@@ -2,6 +2,8 @@ function toAbsoluteDownloadUrl(path) {
   return new URL(path, window.location.href).toString();
 }
 
+const FEATURED_REPO_URL = "https://github.com/ajouatom/openpilot.git";
+
 function escapeHtml(value) {
   return value
     .replaceAll("&", "&amp;")
@@ -198,6 +200,52 @@ function makeResultCard({ tone, title, body, rows, actions, note }) {
   return wrapper;
 }
 
+function renderFeaturedBranches(installerCatalog) {
+  const container = document.getElementById("featured-branches");
+  if (!container) {
+    return;
+  }
+
+  const branches = installerCatalog
+    .filter((installer) => installer.git_url === FEATURED_REPO_URL)
+    .sort((left, right) => left.git_branch.localeCompare(right.git_branch, "en", { numeric: true }));
+
+  if (branches.length === 0) {
+    container.innerHTML = '<p class="empty-state">표시할 브랜치가 없습니다.</p>';
+    return;
+  }
+
+  container.innerHTML = "";
+
+  branches.forEach((installer) => {
+    const shortPath = installer.short_download_path
+      ? `/${installer.short_download_path}`
+      : `/${installer.download_path}`;
+    const downloadUrl = toAbsoluteDownloadUrl(shortPath);
+
+    const row = document.createElement("article");
+    row.className = "branch-row";
+    row.innerHTML = `
+      <div class="branch-main">
+        <p class="branch-name">${escapeHtml(installer.git_branch)}</p>
+        <a class="branch-link mono" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noreferrer">${escapeHtml(shortPath)}</a>
+      </div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "branch-actions";
+
+    const copyButton = document.createElement("button");
+    copyButton.className = "action-button action-secondary";
+    copyButton.textContent = "복사";
+    copyButton.addEventListener("click", () => copyText(downloadUrl, copyButton));
+    actions.appendChild(copyButton);
+
+    row.appendChild(actions);
+    container.appendChild(row);
+  });
+}
+
 function renderConverter(installerCatalog, options = {}) {
   const form = document.getElementById("converter-form");
   const input = document.getElementById("branch-input");
@@ -307,10 +355,13 @@ async function bootstrap() {
     }
 
     const installers = await response.json();
-    renderConverter(Array.isArray(installers) ? installers : [], { dynamicApiAvailable });
+    const installerCatalog = Array.isArray(installers) ? installers : [];
+    renderConverter(installerCatalog, { dynamicApiAvailable });
+    renderFeaturedBranches(installerCatalog);
   } catch (error) {
     console.error(error);
     renderConverter([], { dynamicApiAvailable });
+    renderFeaturedBranches([]);
   }
 }
 
