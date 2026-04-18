@@ -32,5 +32,21 @@
     "short_download_path": "h",
     "sha256": "bb94fece83af8ad7c88e148657da030410e00c378935ea0caa256287e580714f",
     "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "HyukLee-og",
+    "slug_branch": "SP-Old",
+    "aliases": [
+      "SP-Old"
+    ],
+    "git_url": "https://github.com/HyukLee-og/starpilot.git",
+    "git_branch": "SP-Old",
+    "title": "starpilot SP-Old",
+    "description": "Static installer for HyukLee-og/starpilot on the SP-Old branch.",
+    "download_path": "installers/HyukLee-og/SP-Old/installer",
+    "download_url_hint": "/installers/HyukLee-og/SP-Old/installer",
+    "short_download_path": "SP-Old",
+    "sha256": "2d1fff3e05017708930b4ab00d2502a6b1f508ed496935cefbeb8787d9d2d2c5",
+    "size_bytes": 1270680
   }
 ]
