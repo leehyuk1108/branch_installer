@@ -2,8 +2,39 @@ function toAbsoluteDownloadUrl(path) {
   return new URL(path, window.location.href).toString();
 }
 
-const FEATURED_REPO_URL = "https://github.com/ajouatom/openpilot.git";
-const FEATURED_REPO_NAME = "당근파일럿";
+const FEATURED_GROUPS = [
+  {
+    id: "carrotpilot",
+    name: "당근파일럿",
+    gitUrl: "https://github.com/ajouatom/openpilot.git",
+    mode: "picker",
+    kicker: "브랜치 선택",
+  },
+  {
+    id: "frogpilot",
+    name: "FrogPilot",
+    gitUrl: "https://github.com/FrogAi/FrogPilot.git",
+    mode: "single",
+    branch: "FrogPilot",
+    kicker: "기본 브랜치",
+  },
+  {
+    id: "sunnypilot",
+    name: "SunnyPilot",
+    gitUrl: "https://github.com/sunnypilot/sunnypilot.git",
+    mode: "single",
+    branch: "master",
+    kicker: "기본 브랜치",
+  },
+  {
+    id: "openpilot",
+    name: "openpilot",
+    gitUrl: "https://github.com/commaai/openpilot.git",
+    mode: "single",
+    branch: "master",
+    kicker: "기본 브랜치",
+  },
+];
 
 function escapeHtml(value) {
   return value
@@ -211,24 +242,50 @@ function getPreferredShortPath(installer) {
   return `/${installer.download_path}`;
 }
 
-function renderFeaturedBranchPicker(installerCatalog) {
-  const select = document.getElementById("featured-branch-select");
-  const result = document.getElementById("featured-branch-result");
-
-  if (!select || !result) {
-    return;
-  }
-
-  const branches = installerCatalog
-    .filter((installer) => installer.git_url === FEATURED_REPO_URL)
+function getInstallersForGroup(group, installerCatalog) {
+  return installerCatalog
+    .filter((installer) => installer.git_url === group.gitUrl)
+    .filter((installer) => !group.branch || installer.git_branch === group.branch)
     .sort((left, right) => left.git_branch.localeCompare(right.git_branch, "en", { numeric: true }));
+}
 
-  function setResult(node) {
+function createGroupShell(group) {
+  const wrapper = document.createElement("article");
+  wrapper.className = "featured-group";
+  wrapper.innerHTML = `
+    <div class="featured-group-head">
+      <p class="featured-group-kicker">${escapeHtml(group.kicker || "자주 쓰는 브랜치")}</p>
+      <h3>${escapeHtml(group.name)}</h3>
+    </div>
+  `;
+  return wrapper;
+}
+
+function createPickerGroup(group, installers) {
+  const wrapper = createGroupShell(group);
+  const picker = document.createElement("div");
+  picker.className = "branch-picker";
+
+  const label = document.createElement("label");
+  label.className = "sr-only";
+  label.htmlFor = `featured-select-${group.id}`;
+  label.textContent = `${group.name} 브랜치 선택`;
+  picker.appendChild(label);
+
+  const select = document.createElement("select");
+  select.id = `featured-select-${group.id}`;
+  select.className = "branch-select";
+  picker.appendChild(select);
+
+  const result = document.createElement("div");
+  result.className = "converter-result";
+
+  const setResult = (node) => {
     result.innerHTML = "";
     result.appendChild(node);
-  }
+  };
 
-  if (branches.length === 0) {
+  if (installers.length === 0) {
     select.innerHTML = '<option value="">표시할 브랜치가 없습니다.</option>';
     setResult(makeResultCard({
       tone: "info",
@@ -237,10 +294,10 @@ function renderFeaturedBranchPicker(installerCatalog) {
       rows: [],
       actions: [],
     }));
-    return;
+    wrapper.appendChild(picker);
+    wrapper.appendChild(result);
+    return wrapper;
   }
-
-  select.innerHTML = "";
 
   const placeholder = document.createElement("option");
   placeholder.value = "";
@@ -248,8 +305,7 @@ function renderFeaturedBranchPicker(installerCatalog) {
   select.appendChild(placeholder);
 
   const branchMap = new Map();
-
-  branches.forEach((installer) => {
+  installers.forEach((installer) => {
     const option = document.createElement("option");
     option.value = installer.git_branch;
     option.textContent = installer.git_branch;
@@ -283,7 +339,7 @@ function renderFeaturedBranchPicker(installerCatalog) {
 
     setResult(makeResultCard({
       tone: "success",
-      title: `${FEATURED_REPO_NAME} ${installer.git_branch}`,
+      title: `${group.name} ${installer.git_branch}`,
       rows: [
         { label: "링크", value: downloadUrl, highlight: true },
         { label: "브랜치", value: installer.git_branch },
@@ -293,6 +349,60 @@ function renderFeaturedBranchPicker(installerCatalog) {
         { type: "open", label: "열기", url: downloadUrl },
       ],
     }));
+  });
+
+  wrapper.appendChild(picker);
+  wrapper.appendChild(result);
+  return wrapper;
+}
+
+function createSingleGroup(group, installers) {
+  const wrapper = createGroupShell(group);
+  const installer = installers[0];
+
+  if (!installer) {
+    wrapper.appendChild(makeResultCard({
+      tone: "info",
+      title: "안내",
+      body: "표시할 브랜치가 없습니다.",
+      rows: [],
+      actions: [],
+    }));
+    return wrapper;
+  }
+
+  const shortPath = getPreferredShortPath(installer);
+  const downloadUrl = toAbsoluteDownloadUrl(shortPath);
+  wrapper.appendChild(makeResultCard({
+    tone: "success",
+    title: `${group.name} 기본 브랜치`,
+    rows: [
+      { label: "링크", value: downloadUrl, highlight: true },
+      { label: "브랜치", value: installer.git_branch },
+    ],
+    actions: [
+      { type: "copy", label: "복사", url: downloadUrl },
+      { type: "open", label: "열기", url: downloadUrl },
+    ],
+  }));
+
+  return wrapper;
+}
+
+function renderFeaturedGroups(installerCatalog) {
+  const container = document.getElementById("featured-groups");
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = "";
+
+  FEATURED_GROUPS.forEach((group) => {
+    const installers = getInstallersForGroup(group, installerCatalog);
+    const card = group.mode === "picker"
+      ? createPickerGroup(group, installers)
+      : createSingleGroup(group, installers);
+    container.appendChild(card);
   });
 }
 
@@ -405,11 +515,11 @@ async function bootstrap() {
     const installers = await response.json();
     const installerCatalog = Array.isArray(installers) ? installers : [];
     renderConverter(installerCatalog, { dynamicApiAvailable });
-    renderFeaturedBranchPicker(installerCatalog);
+    renderFeaturedGroups(installerCatalog);
   } catch (error) {
     console.error(error);
     renderConverter([], { dynamicApiAvailable });
-    renderFeaturedBranchPicker([]);
+    renderFeaturedGroups([]);
   }
 }
 

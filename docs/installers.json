@@ -225,5 +225,56 @@
     "short_download_path": "SP-Old",
     "sha256": "2d1fff3e05017708930b4ab00d2502a6b1f508ed496935cefbeb8787d9d2d2c5",
     "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "FrogAi",
+    "slug_branch": "FrogPilot",
+    "aliases": [
+      "fp",
+      "frogpilot"
+    ],
+    "git_url": "https://github.com/FrogAi/FrogPilot.git",
+    "git_branch": "FrogPilot",
+    "title": "FrogPilot \uae30\ubcf8 \ube0c\ub79c\uce58",
+    "description": "FrogAi/FrogPilot\uc758 \uae30\ubcf8 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/FrogAi/FrogPilot/installer",
+    "download_url_hint": "/installers/FrogAi/FrogPilot/installer",
+    "short_download_path": "fp",
+    "sha256": "97d9da0c8b436141e3a21e3322f3fcb6cb2573b8730ba171921462393ce8710d",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "sunnypilot",
+    "slug_branch": "master",
+    "aliases": [
+      "sp",
+      "sunnypilot"
+    ],
+    "git_url": "https://github.com/sunnypilot/sunnypilot.git",
+    "git_branch": "master",
+    "title": "SunnyPilot \uae30\ubcf8 \ube0c\ub79c\uce58",
+    "description": "sunnypilot/sunnypilot\uc758 \uae30\ubcf8 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/sunnypilot/master/installer",
+    "download_url_hint": "/installers/sunnypilot/master/installer",
+    "short_download_path": "sp",
+    "sha256": "264d419c4da465cae1262f96944cebe00a6862e4de93808723f6f0878422ef93",
+    "size_bytes": 1270680
+  },
+  {
+    "slug_owner": "commaai",
+    "slug_branch": "master",
+    "aliases": [
+      "op",
+      "openpilot"
+    ],
+    "git_url": "https://github.com/commaai/openpilot.git",
+    "git_branch": "master",
+    "title": "openpilot \uae30\ubcf8 \ube0c\ub79c\uce58",
+    "description": "commaai/openpilot\uc758 \uae30\ubcf8 \ube0c\ub79c\uce58\ub97c \uc704\ud55c \uc815\uc801 \uc778\uc2a4\ud1a8\ub7ec\uc785\ub2c8\ub2e4.",
+    "download_path": "installers/commaai/master/installer",
+    "download_url_hint": "/installers/commaai/master/installer",
+    "short_download_path": "op",
+    "sha256": "eab580db222e1c3dfb2280beddc03e5141b09ad46e1f127219d380bf1c376126",
+    "size_bytes": 1270680
   }
 ]

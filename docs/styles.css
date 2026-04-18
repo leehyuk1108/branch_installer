@@ -141,9 +141,45 @@ body::before {
 .converter-form,
 .converter-result,
 .branch-picker,
+.featured-groups,
 .meta-grid {
   display: grid;
   gap: 14px;
+}
+
+.featured-groups {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.featured-group {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(23, 21, 18, 0.08);
+  background: rgba(255, 255, 255, 0.52);
+  padding: 18px;
+}
+
+.featured-group-head {
+  display: grid;
+  gap: 4px;
+}
+
+.featured-group-kicker {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.featured-group h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
 }
 
 .converter-controls {
@@ -347,6 +383,10 @@ code {
   }
 
   .converter-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .featured-groups {
     grid-template-columns: 1fr;
   }
 
