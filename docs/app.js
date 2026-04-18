@@ -3,6 +3,7 @@ function toAbsoluteDownloadUrl(path) {
 }
 
 const FEATURED_REPO_URL = "https://github.com/ajouatom/openpilot.git";
+const FEATURED_REPO_NAME = "당근파일럿";
 
 function escapeHtml(value) {
   return value
@@ -200,9 +201,21 @@ function makeResultCard({ tone, title, body, rows, actions, note }) {
   return wrapper;
 }
 
-function renderFeaturedBranches(installerCatalog) {
-  const container = document.getElementById("featured-branches");
-  if (!container) {
+function getPreferredShortPath(installer) {
+  const aliases = Array.isArray(installer.aliases) ? installer.aliases.filter(Boolean) : [];
+  if (aliases.length > 0) {
+    const [bestAlias] = [...aliases].sort((left, right) => left.length - right.length || left.localeCompare(right, "en"));
+    return `/${bestAlias}`;
+  }
+
+  return `/${installer.download_path}`;
+}
+
+function renderFeaturedBranchPicker(installerCatalog) {
+  const select = document.getElementById("featured-branch-select");
+  const result = document.getElementById("featured-branch-result");
+
+  if (!select || !result) {
     return;
   }
 
@@ -210,39 +223,76 @@ function renderFeaturedBranches(installerCatalog) {
     .filter((installer) => installer.git_url === FEATURED_REPO_URL)
     .sort((left, right) => left.git_branch.localeCompare(right.git_branch, "en", { numeric: true }));
 
+  function setResult(node) {
+    result.innerHTML = "";
+    result.appendChild(node);
+  }
+
   if (branches.length === 0) {
-    container.innerHTML = '<p class="empty-state">표시할 브랜치가 없습니다.</p>';
+    select.innerHTML = '<option value="">표시할 브랜치가 없습니다.</option>';
+    setResult(makeResultCard({
+      tone: "info",
+      title: FEATURED_REPO_NAME,
+      body: "표시할 브랜치가 없습니다.",
+      rows: [],
+      actions: [],
+    }));
     return;
   }
 
-  container.innerHTML = "";
+  select.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "브랜치를 선택해주세요";
+  select.appendChild(placeholder);
+
+  const branchMap = new Map();
 
   branches.forEach((installer) => {
-    const shortPath = installer.short_download_path
-      ? `/${installer.short_download_path}`
-      : `/${installer.download_path}`;
+    const option = document.createElement("option");
+    option.value = installer.git_branch;
+    option.textContent = installer.git_branch;
+    select.appendChild(option);
+    branchMap.set(installer.git_branch, installer);
+  });
+
+  setResult(makeResultCard({
+    tone: "info",
+    title: FEATURED_REPO_NAME,
+    body: "브랜치를 선택하면 짧은 링크가 나옵니다.",
+    rows: [],
+    actions: [],
+  }));
+
+  select.addEventListener("change", () => {
+    const installer = branchMap.get(select.value);
+    if (!installer) {
+      setResult(makeResultCard({
+        tone: "info",
+        title: FEATURED_REPO_NAME,
+        body: "브랜치를 선택하면 짧은 링크가 나옵니다.",
+        rows: [],
+        actions: [],
+      }));
+      return;
+    }
+
+    const shortPath = getPreferredShortPath(installer);
     const downloadUrl = toAbsoluteDownloadUrl(shortPath);
 
-    const row = document.createElement("article");
-    row.className = "branch-row";
-    row.innerHTML = `
-      <div class="branch-main">
-        <p class="branch-name">${escapeHtml(installer.git_branch)}</p>
-        <a class="branch-link mono" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noreferrer">${escapeHtml(shortPath)}</a>
-      </div>
-    `;
-
-    const actions = document.createElement("div");
-    actions.className = "branch-actions";
-
-    const copyButton = document.createElement("button");
-    copyButton.className = "action-button action-secondary";
-    copyButton.textContent = "복사";
-    copyButton.addEventListener("click", () => copyText(downloadUrl, copyButton));
-    actions.appendChild(copyButton);
-
-    row.appendChild(actions);
-    container.appendChild(row);
+    setResult(makeResultCard({
+      tone: "success",
+      title: `${FEATURED_REPO_NAME} ${installer.git_branch}`,
+      rows: [
+        { label: "링크", value: downloadUrl, highlight: true },
+        { label: "브랜치", value: installer.git_branch },
+      ],
+      actions: [
+        { type: "copy", label: "복사", url: downloadUrl },
+        { type: "open", label: "열기", url: downloadUrl },
+      ],
+    }));
   });
 }
 
@@ -275,9 +325,7 @@ function renderConverter(installerCatalog, options = {}) {
     const published = findPublishedInstaller(parsed, installerCatalog);
 
     if (published) {
-      const shortUrl = published.short_download_path
-        ? toAbsoluteDownloadUrl(published.short_download_path)
-        : toAbsoluteDownloadUrl(published.download_path);
+      const shortUrl = toAbsoluteDownloadUrl(getPreferredShortPath(published));
 
       setResult(makeResultCard({
         tone: "success",
@@ -357,11 +405,11 @@ async function bootstrap() {
     const installers = await response.json();
     const installerCatalog = Array.isArray(installers) ? installers : [];
     renderConverter(installerCatalog, { dynamicApiAvailable });
-    renderFeaturedBranches(installerCatalog);
+    renderFeaturedBranchPicker(installerCatalog);
   } catch (error) {
     console.error(error);
     renderConverter([], { dynamicApiAvailable });
-    renderFeaturedBranches([]);
+    renderFeaturedBranchPicker([]);
   }
 }
 

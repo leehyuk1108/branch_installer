@@ -121,7 +121,7 @@ body::before {
 
 .converter-form,
 .converter-result,
-.branch-list,
+.branch-picker,
 .meta-grid {
   display: grid;
   gap: 12px;
@@ -147,6 +147,25 @@ body::before {
 }
 
 .converter-input:focus {
+  border-color: rgba(217, 94, 26, 0.5);
+  box-shadow: 0 0 0 4px rgba(217, 94, 26, 0.12);
+}
+
+.branch-select {
+  width: 100%;
+  min-width: 0;
+  appearance: none;
+  border: 1px solid rgba(23, 21, 18, 0.12);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ink);
+  padding: 14px 18px;
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+}
+
+.branch-select:focus {
   border-color: rgba(217, 94, 26, 0.5);
   box-shadow: 0 0 0 4px rgba(217, 94, 26, 0.12);
 }
