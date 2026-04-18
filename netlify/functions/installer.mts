@@ -1,4 +1,5 @@
 import type { Config } from "@netlify/functions";
+import { getDeployStore, getStore } from "@netlify/blobs";
 
 type ParsedInput =
   | {
@@ -17,12 +18,27 @@ type InstallerRecord = {
   short_download_path?: string | null;
 };
 
+type AliasRecord = {
+  git_url: string;
+  git_branch: string;
+};
+
 const DEFAULT_BASE_INSTALLER_URL = "https://openpilot.comma.ai";
 const DEFAULT_INSTALLER_USER_AGENT = "AGNOSSetup-10.1.0";
 const DEFAULT_INSTALLER_DEVICE_TYPE = "tizi";
 
 const URL_SLOT_PATTERN = /https:\/\/github\.com\/commaai\/openpilot\.git\?[ ]+/;
 const BRANCH_SLOT_PATTERN = /release3\?[ ]+/;
+const ALIAS_STORE_NAME = "branch-installer-aliases";
+const RESERVED_ALIASES = new Set([
+  "",
+  "api",
+  "i",
+  "app.js",
+  "styles.css",
+  "installers.json",
+  "favicon.ico",
+]);
 
 const getEnv = (key: string, fallback: string) => {
   try {
@@ -134,6 +150,47 @@ const encodeBranchPath = (branch: string) =>
     .split("/")
     .map((part) => encodeURIComponent(part))
     .join("/");
+
+const buildBranchAlias = (branch: string) => {
+  const alias = branch
+    .trim()
+    .replace(/[\\/]+/g, "-")
+    .replace(/\s+/g, "-");
+
+  if (!alias || RESERVED_ALIASES.has(alias)) {
+    return null;
+  }
+
+  return alias;
+};
+
+const getAliasStore = () => {
+  const deployContext = Netlify.context?.deploy?.context;
+  if (deployContext === "production") {
+    return getStore({
+      name: ALIAS_STORE_NAME,
+      consistency: "strong",
+    });
+  }
+
+  return getDeployStore({
+    name: ALIAS_STORE_NAME,
+    consistency: "strong",
+  });
+};
+
+const rememberAlias = async (alias: string, gitUrl: string, gitBranch: string) => {
+  const store = getAliasStore();
+  await store.setJSON(alias, {
+    git_url: gitUrl,
+    git_branch: gitBranch,
+  });
+};
+
+const loadAlias = async (alias: string) => {
+  const store = getAliasStore();
+  return (await store.get(alias, { type: "json" })) as AliasRecord | null;
+};
 
 const parseBranchInput = (rawValue: string): ParsedInput => {
   const raw = rawValue.trim();
@@ -249,6 +306,19 @@ const handleResolve = async (request: Request, url: URL) => {
     });
   }
 
+  const alias = buildBranchAlias(parsed.branch);
+  if (alias) {
+    await rememberAlias(alias, gitUrl, parsed.branch);
+    const shortPath = `/${encodeURIComponent(alias)}`;
+    return jsonResponse({
+      mode: "dynamic",
+      installer_url: new URL(shortPath, request.url).toString(),
+      installer_path: shortPath,
+      git_url: gitUrl,
+      git_branch: parsed.branch,
+    });
+  }
+
   const dynamicPath = `/i/${encodeURIComponent(parsed.owner)}/${encodeURIComponent(parsed.repo)}/${encodeBranchPath(parsed.branch)}`;
   return jsonResponse({
     mode: "dynamic",
@@ -284,6 +354,32 @@ const handleInstaller = async (request: Request, url: URL) => {
   return binaryResponse(request, installer);
 };
 
+const handleShortAlias = async (request: Request, url: URL) => {
+  const alias = decodeURIComponent(url.pathname.slice(1));
+  if (!alias || alias.includes("/")) {
+    return new Response("Not found.", {
+      status: 404,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    });
+  }
+
+  const aliasRecord = await loadAlias(alias);
+  if (!aliasRecord) {
+    return new Response("Not found.", {
+      status: 404,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    });
+  }
+
+  const baseInstaller = await fetchBaseInstaller();
+  const installer = buildInstaller(baseInstaller, aliasRecord.git_url, aliasRecord.git_branch);
+  return binaryResponse(request, installer);
+};
+
 export default async (request: Request) => {
   if (request.method !== "GET" && request.method !== "HEAD") {
     return new Response("Method not allowed.", {
@@ -310,6 +406,10 @@ export default async (request: Request) => {
       return handleInstaller(request, url);
     }
 
+    if (url.pathname !== "/") {
+      return handleShortAlias(request, url);
+    }
+
     return new Response("Not found.", {
       status: 404,
       headers: {
@@ -323,6 +423,6 @@ export default async (request: Request) => {
 };
 
 export const config: Config = {
-  path: ["/api/status", "/api/resolve", "/i/*"],
+  path: ["/api/status", "/api/resolve", "/i/*", "/*"],
   preferStatic: true,
 };

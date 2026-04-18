@@ -8,6 +8,7 @@
     "netlify:dev": "netlify dev"
   },
   "dependencies": {
+    "@netlify/blobs": "^9.1.0",
     "@netlify/functions": "^4.2.6"
   },
   "devDependencies": {
